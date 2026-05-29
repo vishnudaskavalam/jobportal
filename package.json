@@ -12,6 +12,16 @@
     "concurrently": "^9.2.1",
     "turbo": "^2.9.16"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@prisma/client",
+      "@prisma/engines",
+      "bcrypt",
+      "prisma",
+      "unrs-resolver"
+    ]
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
