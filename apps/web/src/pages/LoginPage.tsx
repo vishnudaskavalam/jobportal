@@ -2,9 +2,9 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/privateApi';
-import { storage } from '../lib/storage';
 import { useDispatch } from 'react-redux';
 import { setTokens } from '../store/authSlice';
+import { UserRole } from '@jobportal/types';
 
 interface LoginProps {
   onNavigateToHome: () => void;
@@ -48,7 +48,11 @@ export default function LoginPage({ onNavigateToHome }: LoginProps) {
             }),
           );
         }
-        navigate("/");
+        if(data.user.role === UserRole.ADMIN){
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       } else {
         setStatus('error')
         setMessage(data.message || 'Invalid email or password.')
@@ -198,7 +202,7 @@ export default function LoginPage({ onNavigateToHome }: LoginProps) {
         {/* Footer */}
         <div className="text-center text-sm text-slate-400 mt-2 font-medium">
           Don't have an account?
-          <a href="#signup" className="text-emerald-400 hover:text-emerald-300 font-bold ml-1.5 hover:underline transition-all">Sign up</a>
+          <button onClick={() => navigate('/signup')} className="text-emerald-400 hover:text-emerald-300 font-bold ml-1.5 hover:underline transition-all cursor-pointer">Sign up</button>
         </div>
       </div>
 
