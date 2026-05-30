@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { UserEntity } from './entities/user.entity';
-import { User } from '@jobportal/types';
+import { User, UserRole } from '@jobportal/types';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -28,7 +28,7 @@ export class UsersService {
     const user = this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,
-      role: createUserDto.role || 'USER',
+      role: createUserDto.role || UserRole.USER,
     });
 
     const created = await this.userRepository.save(user);

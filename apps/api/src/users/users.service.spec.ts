@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersService } from './users.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { UsersService } from './users.service.js';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { UserEntity } from './entities/user.entity.js';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 
 describe('UsersService', () => {
   let service: UsersService;
-  let prisma: PrismaService;
+  let repository: any;
 
   const mockUser = {
     id: 'user-id',
@@ -19,12 +20,11 @@ describe('UsersService', () => {
     updatedAt: new Date(),
   };
 
-  const mockPrismaService = {
-    user: {
-      findUnique: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-    },
+  const mockUserRepository = {
+    findOne: jest.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
+    merge: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -32,14 +32,14 @@ describe('UsersService', () => {
       providers: [
         UsersService,
         {
-          provide: PrismaService,
-          useValue: mockPrismaService,
+          provide: getRepositoryToken(UserEntity),
+          useValue: mockUserRepository,
         },
       ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-    prisma = module.get<PrismaService>(PrismaService);
+    repository = module.get(getRepositoryToken(UserEntity));
 
     jest.clearAllMocks();
   });
@@ -58,15 +58,17 @@ describe('UsersService', () => {
         password: 'password123',
       };
 
-      mockPrismaService.user.findUnique.mockResolvedValue(null);
-      mockPrismaService.user.create.mockResolvedValue(mockUser);
+      mockUserRepository.findOne.mockResolvedValue(null);
+      mockUserRepository.create.mockReturnValue(mockUser);
+      mockUserRepository.save.mockResolvedValue(mockUser);
 
       const result = await service.create(createUserDto);
 
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      expect(repository.findOne).toHaveBeenCalledWith({
         where: { email: createUserDto.email },
       });
-      expect(prisma.user.create).toHaveBeenCalled();
+      expect(repository.create).toHaveBeenCalled();
+      expect(repository.save).toHaveBeenCalled();
       expect(result).toEqual(mockUser);
     });
 
@@ -79,10 +81,10 @@ describe('UsersService', () => {
         password: 'password123',
       };
 
-      mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
+      mockUserRepository.findOne.mockResolvedValue(mockUser);
 
       await expect(service.create(createUserDto)).rejects.toThrow(ConflictException);
-      expect(prisma.user.create).not.toHaveBeenCalled();
+      expect(repository.save).not.toHaveBeenCalled();
     });
   });
 
@@ -92,27 +94,29 @@ describe('UsersService', () => {
         firstName: 'Johnny',
       };
 
-      mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
-      mockPrismaService.user.update.mockResolvedValue({
+      mockUserRepository.findOne.mockResolvedValue(mockUser);
+      mockUserRepository.merge.mockReturnValue({
+        ...mockUser,
+        firstName: 'Johnny',
+      });
+      mockUserRepository.save.mockResolvedValue({
         ...mockUser,
         firstName: 'Johnny',
       });
 
       const result = await service.update('user-id', updateUserDto);
 
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({ where: { id: 'user-id' } });
-      expect(prisma.user.update).toHaveBeenCalledWith({
-        where: { id: 'user-id' },
-        data: {
-          firstName: 'Johnny',
-          password: 'hashed-password',
-        },
+      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: 'user-id' } });
+      expect(repository.merge).toHaveBeenCalledWith(mockUser, {
+        firstName: 'Johnny',
+        password: 'hashed-password',
       });
+      expect(repository.save).toHaveBeenCalled();
       expect(result.firstName).toBe('Johnny');
     });
 
     it('should throw NotFoundException if user is not found', async () => {
-      mockPrismaService.user.findUnique.mockResolvedValue(null);
+      mockUserRepository.findOne.mockResolvedValue(null);
 
       await expect(service.update('non-existent', { firstName: 'Johnny' })).rejects.toThrow(
         NotFoundException,

@@ -9,8 +9,7 @@ export interface User {
     createdAt: Date;
     updatedAt: Date;
 }
-
-export enum UserRole {
-  ADMIN = 'ADMIN',
-  USER = 'USER',
+export declare enum UserRole {
+    ADMIN = "ADMIN",
+    USER = "USER"
 }

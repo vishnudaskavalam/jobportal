@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { UserRole } from '@jobportal/types';
 
 @Entity('users')
 export class UserEntity {
@@ -20,8 +21,12 @@ export class UserEntity {
   @Column()
   password: string;
 
-  @Column({ type: 'varchar', default: 'USER' })
-  role: 'ADMIN' | 'USER';
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role: UserRole;
 
   @CreateDateColumn()
   createdAt: Date;
