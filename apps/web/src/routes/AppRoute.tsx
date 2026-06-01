@@ -5,6 +5,7 @@ import SignupPage from '../pages/SignupPage';
 import AdminDashboardPage from '../pages/AdminDashboardPage';
 import AdminJobsListPage from '../pages/admin/AdminJobsListPage';
 import AdminJobFormPage from '../pages/admin/AdminJobFormPage';
+import AdminJobDetailsPage from '../pages/admin/AdminJobDetailsPage';
 import JobsPage from '../pages/JobsPage';
 import JobDetailsPage from '../pages/JobDetailsPage';
 export default function AppRoutes() {
@@ -19,6 +20,7 @@ export default function AppRoutes() {
       <Route path="/admin/jobs" element={<AdminJobsListPage />} />
       <Route path="/admin/jobs/new" element={<AdminJobFormPage />} />
       <Route path="/admin/jobs/:id/edit" element={<AdminJobFormPage />} />
+      <Route path="/admin/jobs/:id" element={<AdminJobDetailsPage />} />
     </Routes>
   );
 }
