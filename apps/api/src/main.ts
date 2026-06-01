@@ -12,6 +12,7 @@ async function bootstrap() {
     origin: process.env.WEB_URL,
     credentials: true,
   });
+  app.enableShutdownHooks();
   await app.listen(process.env.PORT ?? 3001);
 }
 bootstrap();

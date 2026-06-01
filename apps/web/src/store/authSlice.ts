@@ -23,7 +23,6 @@ const authSlice = createSlice({
     ) => {
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
-console.log(action.payload.accessToken);
 
       localStorage.setItem(
         'accessToken',
@@ -49,7 +48,6 @@ console.log(action.payload.accessToken);
     },
 
       logout: (state) => {
-        console.log('LOGOUT CALLED');
       state.accessToken = null;
       state.refreshToken = null;
 

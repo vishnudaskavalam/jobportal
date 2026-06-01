@@ -1,0 +1,10 @@
+export enum JobCategory {
+  ENGINEERING = 'ENGINEERING',
+  DESIGN = 'DESIGN',
+  MARKETING = 'MARKETING',
+  SALES = 'SALES',
+  HR = 'HR',
+  FINANCE = 'FINANCE',
+  DEVOPS = 'DEVOPS',
+  DATA_SCIENCE = 'DATA_SCIENCE',
+}

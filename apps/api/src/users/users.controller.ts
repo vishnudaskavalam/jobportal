@@ -27,12 +27,26 @@ export class UsersController {
   //   return this.usersService.update(id, updateUserDto);
   // }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<User | null> {
-    return this.usersService.findOne(id);
+  @Get('count')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async countUsers(): Promise<number> {
+    return this.usersService.countUsers();
   }
+
   @Get('')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   async findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
+
+  
+  @Get(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async findOne(@Param('id') id: string): Promise<User | null> {
+    return this.usersService.findOne(id);
+  }
+
 }

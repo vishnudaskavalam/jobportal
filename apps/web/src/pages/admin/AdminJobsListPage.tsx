@@ -1,0 +1,281 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import AdminSidebar from '../../componets/layout/AdminSidebar';
+import axiosInstance from '../../api/privateApi';
+import { JobCategory } from '@jobportal/types';
+
+interface Job {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  salary: string;
+  type: string;
+  category: JobCategory;
+  isFeatured: boolean;
+  createdAt: string;
+}
+
+interface MetaData {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../store/store';
+
+export default function AdminJobsListPage() {
+  const navigate = useNavigate();
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+
+  // useEffect(() => {
+  //   if (!accessToken) {
+  //     navigate('/login');
+  //   }
+  // }, [accessToken, navigate]);
+
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [meta, setMeta] = useState<MetaData | null>(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Filters & Pagination
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState<string>('');
+
+  const fetchJobs = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get('/jobs', {
+        params: {
+          page,
+          limit,
+          ...(search && { search }),
+          ...(category && { category }),
+        }
+      });
+      setJobs(response.data.data);
+      setMeta(response.data.meta);
+    } catch (error) {
+      console.error('Failed to fetch jobs:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchJobs();
+  }, [page, search, category]);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    setPage(1); // reset to first page on search
+  };
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCategory(e.target.value);
+    setPage(1);
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex selection:bg-emerald-500 selection:text-white relative overflow-hidden">
+      {/* Background Glow */}
+      <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-emerald-950/10 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-slate-900/40 blur-[120px] pointer-events-none" />
+
+      {/* Sidebar */}
+      <AdminSidebar />
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col min-h-screen z-10">
+        <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-slate-950/50 backdrop-blur-md">
+          <h2 className="text-lg font-semibold text-slate-100">Jobs Management</h2>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => navigate('/admin/jobs/new')}
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.3)] cursor-pointer">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              Post Job
+            </button>
+          </div>
+        </header>
+
+        <div className="p-6 md:p-8 flex-1 flex flex-col gap-6 overflow-y-auto">
+          
+          {/* Filters Bar */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-slate-900/60 backdrop-blur-xl border border-white/5 p-4 rounded-2xl">
+            <div className="relative w-full sm:w-96">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                placeholder="Search jobs, companies, locations..."
+                className="w-full h-11 pl-10 pr-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-100 placeholder:text-slate-500 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300"
+                value={search}
+                onChange={handleSearch}
+              />
+            </div>
+
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <select 
+                className="h-11 px-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-300 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300 cursor-pointer w-full sm:w-auto"
+                value={category}
+                onChange={handleCategoryChange}
+              >
+                <option value="">All Categories</option>
+                {Object.values(JobCategory).map((cat) => (
+                  <option key={cat} value={cat}>{cat.replace('_', ' ')}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Table Container */}
+          <div className="bg-slate-900/60 backdrop-blur-xl border border-white/5 rounded-2xl overflow-hidden flex-1 flex flex-col">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-white/5 bg-slate-950/50 text-xs uppercase tracking-wider text-slate-400 font-semibold">
+                    <th className="px-6 py-4">Job Title</th>
+                    <th className="px-6 py-4">Company</th>
+                    <th className="px-6 py-4 hidden md:table-cell">Location</th>
+                    <th className="px-6 py-4 hidden sm:table-cell">Type</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 text-sm font-medium">
+                  {loading ? (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
+                        <div className="flex flex-col items-center gap-3">
+                          <svg className="w-8 h-8 animate-spin text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          Loading jobs...
+                        </div>
+                      </td>
+                    </tr>
+                  ) : jobs.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
+                        No jobs found matching your criteria.
+                      </td>
+                    </tr>
+                  ) : (
+                    jobs.map((job) => (
+                      <tr key={job.id} className="hover:bg-slate-800/30 transition-colors group">
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col">
+                            <span className="text-slate-200 font-bold">{job.title}</span>
+                            <span className="text-xs text-slate-500 mt-0.5">{job.category}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-slate-300">{job.company}</td>
+                        <td className="px-6 py-4 text-slate-400 hidden md:table-cell">{job.location}</td>
+                        <td className="px-6 py-4 hidden sm:table-cell">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-800 border border-white/5 text-xs text-slate-300">
+                            {job.type}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          {job.isFeatured ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-xs text-amber-400 font-semibold">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                              Featured
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 font-semibold">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                              Active
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button 
+                              onClick={() => navigate(`/admin/jobs/${job.id}/edit`)}
+                              className="p-2 text-slate-400 hover:text-emerald-400 bg-slate-900 rounded-lg border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer">
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                              </svg>
+                            </button>
+                            <button className="p-2 text-slate-400 hover:text-rose-400 bg-slate-900 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all cursor-pointer">
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {!loading && meta && (
+              <div className="mt-auto px-6 py-4 border-t border-white/5 flex items-center justify-between bg-slate-950/30">
+                <p className="text-sm text-slate-400 font-medium">
+                  Showing <span className="text-slate-200 font-bold">{Math.min((meta.page - 1) * meta.limit + 1, meta.total)}</span> to <span className="text-slate-200 font-bold">{Math.min(meta.page * meta.limit, meta.total)}</span> of <span className="text-slate-200 font-bold">{meta.total}</span> jobs
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={!meta.hasPreviousPage}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-900 border border-white/5 text-sm font-medium text-slate-300 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Prev
+                  </button>
+                  
+                  {/* Page Numbers */}
+                  <div className="flex items-center gap-1 hidden sm:flex">
+                    {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                      <button
+                        key={pageNum}
+                        onClick={() => setPage(pageNum)}
+                        className={`w-8 h-8 rounded-lg text-sm font-bold flex items-center justify-center transition-colors ${
+                          pageNum === meta.page 
+                            ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' 
+                            : 'bg-slate-900 border border-white/5 text-slate-400 hover:bg-slate-800 hover:text-slate-200 cursor-pointer'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => setPage(p => Math.min(meta.totalPages, p + 1))}
+                    disabled={!meta.hasNextPage}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-900 border border-white/5 text-sm font-medium text-slate-300 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  >
+                    Next
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module.js';
+import { JobsModule } from './jobs/jobs.module';
+import { AdminSeed } from './seeds/admin-seed';
 
 @Module({
   imports: [
@@ -24,9 +26,10 @@ import { AuthModule } from './auth/auth.module.js';
         autoLoadEntities: true,
       }),
     }),
-
+AdminSeed,
     UsersModule,
     AuthModule,
+    JobsModule,
   ],
 })
 export class AppModule {}

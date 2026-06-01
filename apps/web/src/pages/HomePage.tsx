@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 // import LoginPage from './pages/LoginPage'
 import Header from '../componets/layout/header'
 import { useSelector } from 'react-redux';
@@ -6,11 +6,15 @@ import { logout } from '../store/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import type { RootState } from '../store/store';
+import axiosInstance from '../api/privateApi';
+import Footer from '../componets/layout/footer';
 
 export default function App() {
   const [searchTerm, setSearchTerm] = useState('')
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
+
   const accessToken = useSelector(
     (state:RootState) => state.auth.accessToken,
   );
@@ -27,13 +31,25 @@ export default function App() {
 
   }
 
+  let [featuredJobs, setFeaturedJobs] = useState([]);
 
-  const featuredJobs = [
-    { id: 1, title: 'Senior Software Engineer', company: 'TechNova Solutions', location: 'San Francisco, CA (Hybrid)', salary: '$140k - $185k', type: 'Full-time', logoColor: 'bg-indigo-500/10 text-indigo-400' },
-    { id: 2, title: 'Lead Product Designer', company: 'PixelFlow Studios', location: 'Remote (US/Canada)', salary: '$120k - $155k', type: 'Full-time', logoColor: 'bg-rose-500/10 text-rose-400' },
-    { id: 3, title: 'Data Scientist', company: 'Apex Analytics', location: 'New York, NY', salary: '$130k - $160k', type: 'Contract', logoColor: 'bg-amber-500/10 text-amber-400' },
-    { id: 4, title: 'DevOps Engineer', company: 'CloudScale Corp', location: 'Austin, TX (On-site)', salary: '$115k - $145k', type: 'Full-time', logoColor: 'bg-emerald-500/10 text-emerald-400' },
-  ]
+  const fetchJobs = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(`/jobs/list`, {params : {isFeatured : true}});
+      setFeaturedJobs(response.data.data);
+      console.log(response.data.data);
+    } catch (error: any) {
+      console.error('Failed to fetch jobs:', error);
+
+    }finally {
+      setLoading(false);
+    }
+  };
+useEffect(() => {
+    fetchJobs();
+}, []);
+  
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-white">
@@ -56,29 +72,7 @@ export default function App() {
             Discover thousands of full-time, remote, and hybrid job opportunities with the world's most innovative tech companies.
           </p>
 
-          {/* Job Search Box */}
-          <div className="w-full max-w-2xl bg-slate-900/60 backdrop-blur-md border border-white/5 p-2 rounded-2xl shadow-xl flex flex-col sm:flex-row gap-2 mt-4">
-            <div className="flex-grow relative flex items-center">
-              <svg className="absolute left-4 w-5 h-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Job title, keywords, or company..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full h-12 pl-12 pr-4 bg-transparent text-[15px] font-medium text-slate-100 placeholder:text-slate-600 outline-none"
-              />
-            </div>
-            <button
-              type="button"
-              // onClick={ }
-              className="h-12 bg-emerald-500 text-white font-bold px-8 rounded-xl hover:bg-emerald-600 hover:shadow-lg transition-all flex items-center justify-center cursor-pointer"
-            >
-              Search Jobs
-            </button>
-          </div>
+          
         </section>
 
         {/* Featured Jobs */}
@@ -87,43 +81,76 @@ export default function App() {
             <h2 className="text-2xl font-bold tracking-tight text-slate-100">Featured Job Openings</h2>
             <button
               type="button"
-              // onClick={}
+              onClick={()=>{navigate('/jobs')}}
               className="text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer"
             >
               View all jobs →
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {featuredJobs.map((job) => (
-              <div
-                key={job.id}
-                className="bg-slate-900/40 border border-white/5 p-6 rounded-2xl hover:border-emerald-500/20 hover:bg-slate-900/60 hover:shadow-xl transition-all duration-300 flex items-start gap-4 group cursor-pointer"
-                // onClick={}
-              >
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${job.logoColor} font-bold text-lg`}>
-                  {job.company.charAt(0)}
-                </div>
-                <div className="flex-grow flex flex-col gap-1.5">
-                  <span className="text-[13px] font-bold text-emerald-400 tracking-wide uppercase">{job.type}</span>
-                  <h3 className="text-lg font-bold text-slate-100 group-hover:text-emerald-400 transition-colors">{job.title}</h3>
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium text-slate-400">
-                    <span>{job.company}</span>
-                    <span className="text-slate-700">•</span>
-                    <span>{job.location}</span>
+
+            {loading ? (
+              
+                <div  className="px-6 py-12 text-center text-slate-400 justify-">
+                  <div className="flex flex-col items-center gap-3">
+                    <svg className="w-8 h-8 animate-spin text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Loading jobs...
                   </div>
-                  <span className="text-sm font-bold text-slate-300 mt-1">{job.salary}</span>
+                
+              </div>
+            ) : featuredJobs.length === 0 ? (
+              <div  className="px-6 py-12 text-center text-slate-400">
+                <div className="flex flex-col items-center gap-3">
+                  No jobs found matching your criteria.
                 </div>
               </div>
-            ))}
-          </div>
+        
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {featuredJobs.map((job) => (
+                    <div
+                      key={job.id}
+                      className="bg-slate-900/40 border border-white/5 p-6 rounded-2xl hover:border-emerald-500/20 hover:bg-slate-900/60 hover:shadow-xl transition-all duration-300 flex items-start gap-4 group cursor-pointer"
+                      onClick={() => navigate(`/jobs/${job.id}`)}
+                    >
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center ${job.logoColor} font-bold text-lg`}
+                      >
+                        {job.company.charAt(0)}
+                      </div>
+
+                      <div className="flex-grow flex flex-col gap-1.5">
+                        <span className="text-[13px] font-bold text-emerald-400 tracking-wide uppercase">
+                          {job.type}
+                        </span>
+
+                        <h3 className="text-lg font-bold text-slate-100 group-hover:text-emerald-400 transition-colors">
+                          {job.title}
+                        </h3>
+
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium text-slate-400">
+                          <span>{job.company}</span>
+                          <span className="text-slate-700">•</span>
+                          <span>{job.location}</span>
+                        </div>
+
+                        <span className="text-sm font-bold text-slate-300 mt-1">
+                          {job.salary}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+            )
+              }
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-950 border-t border-white/5 px-6 py-8 text-center text-sm font-medium text-slate-500">
-        <p>© {new Date().getFullYear()} JobPortal. All rights reserved.</p>
-      </footer>
+      <Footer />
     </div>
   )
 }

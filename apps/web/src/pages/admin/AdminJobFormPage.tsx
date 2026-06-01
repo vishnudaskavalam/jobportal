@@ -1,0 +1,327 @@
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import AdminSidebar from '../../componets/layout/AdminSidebar';
+import axiosInstance from '../../api/privateApi';
+import { JobCategory } from '@jobportal/types';
+import type { RootState } from '../../store/store';
+
+// We must manually duplicate JobType enum since it's defined in api/src/jobs/entities/job.entity.ts
+// In a real monorepo, we'd move JobType to @jobportal/types to share it.
+export enum JobType {
+  FULL_TIME = 'FULL_TIME',
+  PART_TIME = 'PART_TIME',
+  CONTRACT = 'CONTRACT',
+  INTERNSHIP = 'INTERNSHIP',
+}
+
+export default function AdminJobFormPage() {
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const isEditMode = Boolean(id);
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+
+  useEffect(() => {
+    if (!accessToken) {
+      navigate('/login');
+    }
+  }, [accessToken, navigate]);
+
+  const [formData, setFormData] = useState({
+    title: '',
+    company: '',
+    location: '',
+    salary: '',
+    type: JobType.FULL_TIME,
+    category: JobCategory.ENGINEERING,
+    logoColor: '#10B981',
+    isFeatured: false,
+  });
+
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    if (isEditMode) {
+      fetchJobDetails();
+    }
+  }, [isEditMode, id]);
+
+  const fetchJobDetails = async () => {
+    setStatus('loading');
+    try {
+      const response = await axiosInstance.get(`/jobs/${id}`);
+      const job = response.data;
+      setFormData({
+        title: job.title || '',
+        company: job.company || '',
+        location: job.location || '',
+        salary: job.salary || '',
+        type: job.type || JobType.FULL_TIME,
+        category: job.category || JobCategory.ENGINEERING,
+        logoColor: job.logoColor || '#10B981',
+        isFeatured: job.isFeatured || false,
+      });
+      setStatus('idle');
+    } catch (error: any) {
+      setStatus('error');
+      setMessage(error.response?.data?.message || 'Failed to load job details.');
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData((prev) => ({ ...prev, [name]: checked }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('loading');
+    setMessage('');
+
+    try {
+      if (isEditMode) {
+        await axiosInstance.patch(`/jobs/${id}`, formData);
+        setMessage('Job updated successfully!');
+      } else {
+        await axiosInstance.post('/jobs', formData);
+        setMessage('Job created successfully!');
+      }
+      setStatus('success');
+      
+      setTimeout(() => {
+        navigate('/admin/jobs');
+      }, 1500);
+    } catch (error: any) {
+      setStatus('error');
+      setMessage(error.response?.data?.message || 'An error occurred while saving the job.');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex selection:bg-emerald-500 selection:text-white relative overflow-hidden">
+      {/* Background Glow */}
+      <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-emerald-950/10 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-slate-900/40 blur-[120px] pointer-events-none" />
+
+      {/* Sidebar */}
+      <AdminSidebar />
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col min-h-screen z-10">
+        <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-slate-950/50 backdrop-blur-md">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => navigate('/admin/jobs')}
+              className="p-2 text-slate-400 hover:text-emerald-400 bg-slate-900 rounded-lg border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <h2 className="text-lg font-semibold text-slate-100">
+              {isEditMode ? 'Edit Job' : 'Create New Job'}
+            </h2>
+          </div>
+        </header>
+
+        <div className="p-6 md:p-8 flex-1 overflow-y-auto flex justify-center">
+          <div className="w-full max-w-3xl">
+            {status === 'error' && (
+              <div className="mb-6 flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 text-red-300 rounded-xl text-sm leading-relaxed">
+                <svg className="w-5 h-5 shrink-0 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <span>{message}</span>
+              </div>
+            )}
+
+            {status === 'success' && (
+              <div className="mb-6 flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 rounded-xl text-sm leading-relaxed">
+                <svg className="w-5 h-5 shrink-0 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+                <span>{message} Redirecting...</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="bg-slate-900/60 backdrop-blur-xl border border-white/5 p-6 sm:p-8 rounded-2xl flex flex-col gap-6">
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Title */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-[13px] font-semibold text-slate-300 tracking-wide" htmlFor="title">Job Title</label>
+                  <input
+                    id="title"
+                    name="title"
+                    type="text"
+                    required
+                    disabled={status === 'loading'}
+                    value={formData.title}
+                    onChange={handleChange}
+                    placeholder="e.g. Senior Frontend Developer"
+                    className="w-full h-11 px-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-100 placeholder:text-slate-600 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all"
+                  />
+                </div>
+
+                {/* Company */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-[13px] font-semibold text-slate-300 tracking-wide" htmlFor="company">Company Name</label>
+                  <input
+                    id="company"
+                    name="company"
+                    type="text"
+                    required
+                    disabled={status === 'loading'}
+                    value={formData.company}
+                    onChange={handleChange}
+                    placeholder="e.g. TechCorp Inc."
+                    className="w-full h-11 px-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-100 placeholder:text-slate-600 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all"
+                  />
+                </div>
+
+                {/* Location */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-[13px] font-semibold text-slate-300 tracking-wide" htmlFor="location">Location</label>
+                  <input
+                    id="location"
+                    name="location"
+                    type="text"
+                    required
+                    disabled={status === 'loading'}
+                    value={formData.location}
+                    onChange={handleChange}
+                    placeholder="e.g. New York, NY (Remote)"
+                    className="w-full h-11 px-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-100 placeholder:text-slate-600 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all"
+                  />
+                </div>
+
+                {/* Salary */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-[13px] font-semibold text-slate-300 tracking-wide" htmlFor="salary">Salary Range</label>
+                  <input
+                    id="salary"
+                    name="salary"
+                    type="text"
+                    required
+                    disabled={status === 'loading'}
+                    value={formData.salary}
+                    onChange={handleChange}
+                    placeholder="e.g. $120k - $150k"
+                    className="w-full h-11 px-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-100 placeholder:text-slate-600 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all"
+                  />
+                </div>
+
+                {/* Job Type */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-[13px] font-semibold text-slate-300 tracking-wide" htmlFor="type">Job Type</label>
+                  <select
+                    id="type"
+                    name="type"
+                    required
+                    disabled={status === 'loading'}
+                    value={formData.type}
+                    onChange={handleChange}
+                    className="w-full h-11 px-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-100 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all cursor-pointer"
+                  >
+                    {Object.values(JobType).map((type) => (
+                      <option key={type} value={type}>{type.replace('_', ' ')}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Job Category */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-[13px] font-semibold text-slate-300 tracking-wide" htmlFor="category">Category</label>
+                  <select
+                    id="category"
+                    name="category"
+                    required
+                    disabled={status === 'loading'}
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="w-full h-11 px-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-100 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all cursor-pointer"
+                  >
+                    {Object.values(JobCategory).map((cat) => (
+                      <option key={cat} value={cat}>{cat.replace('_', ' ')}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Logo Color */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-[13px] font-semibold text-slate-300 tracking-wide" htmlFor="logoColor">Logo Brand Color</label>
+                  <div className="flex items-center gap-3 w-full h-11 px-4 bg-slate-950 border border-white/5 rounded-xl focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/10 transition-all">
+                    <input
+                      id="logoColor"
+                      name="logoColor"
+                      type="color"
+                      disabled={status === 'loading'}
+                      value={formData.logoColor}
+                      onChange={handleChange}
+                      className="w-6 h-6 rounded cursor-pointer border-none bg-transparent"
+                    />
+                    <input 
+                      type="text" 
+                      name="logoColor" 
+                      value={formData.logoColor} 
+                      onChange={handleChange}
+                      className="flex-1 bg-transparent border-none text-sm font-medium text-slate-100 outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Featured Toggle */}
+                <div className="flex items-center gap-4 h-full pt-4 md:pt-6">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="isFeatured"
+                      className="sr-only peer"
+                      checked={formData.isFeatured}
+                      onChange={handleChange}
+                      disabled={status === 'loading'}
+                    />
+                    <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 transition-colors duration-300"></div>
+                    <span className="ml-3 text-sm font-semibold text-slate-300">Featured Job</span>
+                  </label>
+                </div>
+
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-end pt-4 border-t border-white/5 mt-2">
+                <button
+                  type="submit"
+                  disabled={status === 'loading'}
+                  className="px-8 h-12 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 hover:shadow-[0_4px_25px_rgba(16,185,129,0.25)] hover:-translate-y-0.5 active:translate-y-0.5 disabled:bg-emerald-500/50 disabled:translate-y-0 disabled:shadow-none flex items-center justify-center gap-2 cursor-pointer transition-all duration-300"
+                >
+                  {status === 'loading' ? (
+                    <>
+                      <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    isEditMode ? 'Update Job' : 'Create Job'
+                  )}
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
