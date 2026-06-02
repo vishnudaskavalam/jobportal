@@ -48,7 +48,10 @@ export default function LoginPage() {
       }
     } catch (err: any) {
         setStatus('error')
-        setMessage(err?.data?.message || 'Invalid email or password.')
+        const errorMessage = Array.isArray(err?.data?.message) 
+            ? err.data.message[0] 
+            : (err?.data?.message || 'Invalid email or password.');
+        setMessage(errorMessage)
     }
   }
 

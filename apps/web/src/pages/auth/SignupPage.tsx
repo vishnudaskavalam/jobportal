@@ -47,7 +47,10 @@ export default function SignupPage() {
       }, 1500)
     } catch (err: any) {
       setStatus('error')
-      setMessage(err?.data?.message || 'Failed to connect to authentication server.')
+      const errorMessage = Array.isArray(err?.data?.message) 
+          ? err.data.message[0] 
+          : (err?.data?.message || 'Failed to connect to authentication server.')
+      setMessage(errorMessage)
     }
   }
 

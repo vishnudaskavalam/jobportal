@@ -70,6 +70,20 @@ pnpm run dev:api
 pnpm run dev:web
 ```
 
+## 🗄️ Database & Migrations
+
+This project uses TypeORM for database management. The application requires migrations to be run to generate tables and seed initial data.
+
+To run migrations and populate your database with actual test data (categories, jobs, and test users), run the following from the root directory:
+```bash
+pnpm --filter api run migration:run
+```
+
+If you make changes to the TypeORM entities and need to generate a new migration, run:
+```bash
+pnpm --filter api run migration:generate -- src/migrations/YourMigrationName
+```
+
 ## 📂 Project Structure
 
 jobportal/

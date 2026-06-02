@@ -14,7 +14,7 @@ export const jobsApi = apiSlice.injectEndpoints({
         method: 'GET',
         params,
       }),
-      providesTags: ['Job'],
+      providesTags: [{ type: 'Job', id: 'LIST' }],
     }),
     getAdminJobs: builder.query<JobsResponse, any>({
       query: (params) => ({
@@ -22,7 +22,7 @@ export const jobsApi = apiSlice.injectEndpoints({
         method: 'GET',
         params,
       }),
-      providesTags: ['Job'],
+      providesTags: [{ type: 'Job', id: 'LIST' }],
     }),
     getJobById: builder.query<Job, string>({
       query: (id) => ({
@@ -72,7 +72,7 @@ export const jobsApi = apiSlice.injectEndpoints({
         url: '/jobs/count',
         method: 'GET',
       }),
-      providesTags: ['Job'],
+      providesTags: [{ type: 'Job', id: 'LIST' }],
     }),
   }),
 });
