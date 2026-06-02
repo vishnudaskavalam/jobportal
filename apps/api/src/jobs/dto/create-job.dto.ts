@@ -18,6 +18,10 @@ export class CreateJobDto {
   @IsString()
   location: string;
 
+  @IsOptional()
+  @IsString()
+  description?: string;
+
   @IsString()
   salary: string;
 

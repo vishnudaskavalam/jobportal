@@ -20,6 +20,7 @@ interface Job {
   isFeatured: boolean;
   createdAt: string;
   applications?: any[];
+  description?: string;
 }
 
 export default function JobDetailsPage() {
@@ -28,9 +29,7 @@ export default function JobDetailsPage() {
   const dispatch = useDispatch();
   
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
-  // Optional: Get user ID from store if available, to check if they already applied.
-  // Assuming user info might not be fully in the store yet, we will rely on backend error.
-
+  
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [applyStatus, setApplyStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -62,7 +61,7 @@ export default function JobDetailsPage() {
     setMessage('');
     
     try {
-      await axiosInstance.post(`/jobs/${id}/apply`);
+      await axiosInstance.post(`/jobs/${id}/apply`,);
       setApplyStatus('success');
       setMessage('Successfully applied for this position!');
     } catch (error: any) {
@@ -226,32 +225,29 @@ export default function JobDetailsPage() {
           </div>
         )}
 
-        {/* Job Description Dummy Content (since API doesn't have a full description field yet) */}
+        {/* Job Description */}
         <div className="bg-slate-900/40 border border-white/5 rounded-3xl p-8 md:p-12 flex flex-col gap-8">
           <section className="flex flex-col gap-4">
             <h3 className="text-xl font-bold text-white border-b border-white/5 pb-3">About The Role</h3>
-            <div className="text-slate-400 font-medium leading-relaxed space-y-4">
-              <p>
-                We are looking for a highly skilled professional to join our fast-growing team at {job.company}. 
-                As a {job.title}, you will be responsible for leading key initiatives, collaborating with cross-functional teams, 
-                and driving the success of our core projects.
-              </p>
-              <p>
-                This is a fantastic opportunity to work in a dynamic environment, utilizing cutting-edge technologies 
-                and contributing to products that impact millions of users. If you are passionate about excellence and innovation, 
-                we want to hear from you.
-              </p>
-            </div>
-          </section>
-
-          <section className="flex flex-col gap-4">
-            <h3 className="text-xl font-bold text-white border-b border-white/5 pb-3">Key Requirements</h3>
-            <ul className="text-slate-400 font-medium leading-relaxed list-disc list-inside space-y-2">
-              <li>Proven experience working in a similar role within a fast-paced industry.</li>
-              <li>Strong problem-solving skills and the ability to think critically.</li>
-              <li>Excellent communication and teamwork abilities.</li>
-              <li>A proactive mindset with a drive for continuous learning and improvement.</li>
-            </ul>
+            {job.description ? (
+              <div 
+                className="text-slate-400 font-medium leading-relaxed space-y-4 [&>ul]:list-disc [&>ul]:pl-4 [&>ul>li]:mb-2 [&>ol]:list-decimal [&>ol]:pl-4 [&>ol>li]:mb-2 [&>h1]:text-2xl [&>h1]:text-white [&>h1]:mt-6 [&>h1]:mb-4 [&>h2]:text-xl [&>h2]:text-white [&>h2]:mt-5 [&>h2]:mb-3 [&>h3]:text-lg [&>h3]:text-white [&>h3]:mt-4 [&>h3]:mb-2 [&>p]:mb-4 [&>strong]:text-slate-200"
+                dangerouslySetInnerHTML={{ __html: job.description }} 
+              />
+            ) : (
+              <div className="text-slate-400 font-medium leading-relaxed space-y-4">
+                <p>
+                  We are looking for a highly skilled professional to join our fast-growing team at {job.company}. 
+                  As a {job.title}, you will be responsible for leading key initiatives, collaborating with cross-functional teams, 
+                  and driving the success of our core projects.
+                </p>
+                <p>
+                  This is a fantastic opportunity to work in a dynamic environment, utilizing cutting-edge technologies 
+                  and contributing to products that impact millions of users. If you are passionate about excellence and innovation, 
+                  we want to hear from you.
+                </p>
+              </div>
+            )}
           </section>
         </div>
 

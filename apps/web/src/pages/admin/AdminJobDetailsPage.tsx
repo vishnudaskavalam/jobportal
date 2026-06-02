@@ -10,6 +10,11 @@ interface JobApplication {
   userId: string;
   status: string;
   appliedAt: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  };
 }
 
 interface Job {
@@ -230,9 +235,16 @@ export default function AdminJobDetailsPage() {
                   <div className="flex flex-col gap-3">
                     {job.applications.slice(0, 5).map((app, index) => (
                       <div key={index} className="flex flex-col p-3 rounded-xl bg-slate-950/50 border border-white/5 group hover:border-emerald-500/20 transition-colors">
-                        <div className="flex justify-between items-start mb-1">
-                          <span className="text-sm font-medium text-slate-200 line-clamp-1" title={app.userId}>User ID: {app.userId.substring(0, 8)}...</span>
-                          <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${app.status === 'APPLIED' ? 'bg-blue-500/10 text-blue-400' : 'bg-slate-800 text-slate-400'}`}>
+                        <div className="flex justify-between items-start mb-1 gap-2">
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-sm font-bold text-slate-200 line-clamp-1" title={app.user?.name || 'Unknown User'}>
+                              {app.user?.name || 'Unknown User'}
+                            </span>
+                            <span className="text-xs text-slate-400 line-clamp-1" title={app.user?.email || app.userId}>
+                              {app.user?.email || `ID: ${app.userId ? app.userId.substring(0, 8) : 'Unknown'}...`}
+                            </span>
+                          </div>
+                          <span className={`shrink-0 text-[10px] font-bold uppercase px-2 py-0.5 rounded ${app.status === 'APPLIED' ? 'bg-blue-500/10 text-blue-400' : 'bg-slate-800 text-slate-400'}`}>
                             {app.status}
                           </span>
                         </div>

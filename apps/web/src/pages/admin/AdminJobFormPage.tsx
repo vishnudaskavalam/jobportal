@@ -5,6 +5,8 @@ import AdminSidebar from '../../componets/layout/AdminSidebar';
 import axiosInstance from '../../api/privateApi';
 import { JobCategory } from '@jobportal/types';
 import type { RootState } from '../../store/store';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 // We must manually duplicate JobType enum since it's defined in api/src/jobs/entities/job.entity.ts
 // In a real monorepo, we'd move JobType to @jobportal/types to share it.
@@ -36,6 +38,7 @@ export default function AdminJobFormPage() {
     category: JobCategory.ENGINEERING,
     logoColor: '#10B981',
     isFeatured: false,
+    description: '',
   });
 
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -61,6 +64,7 @@ export default function AdminJobFormPage() {
         category: job.category || JobCategory.ENGINEERING,
         logoColor: job.logoColor || '#10B981',
         isFeatured: job.isFeatured || false,
+        description: job.description || '',
       });
       setStatus('idle');
     } catch (error: any) {
@@ -77,6 +81,10 @@ export default function AdminJobFormPage() {
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
+  };
+
+  const handleDescriptionChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, description: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -295,6 +303,20 @@ export default function AdminJobFormPage() {
                   </label>
                 </div>
 
+              </div>
+
+              {/* Job Description (Full Width) */}
+              <div className="flex flex-col gap-2 mt-2">
+                <label className="text-[13px] font-semibold text-slate-300 tracking-wide">Job Description</label>
+                <div className="bg-slate-950 border border-white/5 rounded-xl overflow-hidden [&_.ql-toolbar]:bg-slate-900 [&_.ql-toolbar]:border-white/5 [&_.ql-container]:border-none [&_.ql-editor]:min-h-[200px] [&_.ql-editor]:text-slate-100 [&_.ql-editor]:text-sm [&_.ql-stroke]:stroke-slate-300 [&_.ql-fill]:fill-slate-300 [&_.ql-picker]:text-slate-300 focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/10 transition-all">
+                  <ReactQuill 
+                    theme="snow" 
+                    value={formData.description} 
+                    onChange={handleDescriptionChange}
+                    readOnly={status === 'loading'}
+                    placeholder="Write a detailed job description..."
+                  />
+                </div>
               </div>
 
               {/* Submit Button */}

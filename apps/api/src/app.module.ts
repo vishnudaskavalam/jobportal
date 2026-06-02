@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module.js';
 import { JobsModule } from './jobs/jobs.module';
-import { AdminSeed } from './seeds/admin-seed';
+import { SeedModule } from './seeds/admin-seed.module';
 
 @Module({
   imports: [
@@ -26,10 +26,11 @@ import { AdminSeed } from './seeds/admin-seed';
         autoLoadEntities: true,
       }),
     }),
-AdminSeed,
+    SeedModule,
     UsersModule,
     AuthModule,
     JobsModule,
   ],
+  
 })
 export class AppModule {}

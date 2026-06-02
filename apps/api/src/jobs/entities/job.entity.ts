@@ -41,6 +41,9 @@ export class JobEntity {
   @Column()
   location: string;
 
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
   @Column({ nullable: true })
   salary: string;
 

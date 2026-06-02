@@ -32,6 +32,8 @@ findAll(
     Number(query.limit),
     query.category,
     query.search,
+    query.location,
+    query.posted,
   );
   }
 
@@ -51,6 +53,8 @@ jobList(
     Number(query.limit),
     query.category,
     query.search,
+    query.location,
+    query.posted,
   );
 }
 
@@ -68,8 +72,8 @@ jobList(
 
   @Post(':id/apply')
   @UseGuards(AuthGuard)
-  apply(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.jobsService.apply(id, user.id);
+  apply(@Param('id') id: string, @CurrentUser() user: any) {    
+    return this.jobsService.apply(id, user.sub);
   }
 
   @Delete(':id')

@@ -42,6 +42,8 @@ export default function JobsPage() {
   const [limit] = useState(12);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string>('');
+  const [location, setLocation] = useState('');
+  const [posted, setPosted] = useState('');
 
   const fetchJobs = async () => {
     setLoading(true);
@@ -52,6 +54,8 @@ export default function JobsPage() {
           limit,
           ...(search && { search }),
           ...(category && { category }),
+          ...(location && { location }),
+          ...(posted && { posted }),
         }
       });
       setJobs(response.data.data);
@@ -65,7 +69,7 @@ export default function JobsPage() {
 
   useEffect(() => {
     fetchJobs();
-  }, [page, search, category]);
+  }, [page, search, category, location, posted]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -74,6 +78,16 @@ export default function JobsPage() {
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCategory(e.target.value);
+    setPage(1); // Reset to first page
+  };
+
+  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocation(e.target.value);
+    setPage(1); // Reset to first page
+  };
+
+  const handlePostedChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setPosted(e.target.value);
     setPage(1); // Reset to first page
   };
 
@@ -104,8 +118,8 @@ export default function JobsPage() {
             <p className="text-slate-400 font-medium">Browse thousands of open positions matching your skills.</p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-slate-900/60 backdrop-blur-xl border border-white/5 p-4 rounded-2xl w-full">
-            <div className="relative w-full sm:w-96">
+          <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-900/60 backdrop-blur-xl border border-white/5 p-4 rounded-2xl w-full">
+            <div className="relative w-full md:w-1/3">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -113,16 +127,32 @@ export default function JobsPage() {
               </div>
               <input
                 type="text"
-                placeholder="Search job titles, companies..."
+                placeholder="Search titles, companies..."
                 className="w-full h-12 pl-12 pr-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-100 placeholder:text-slate-500 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300"
                 value={search}
                 onChange={handleSearch}
               />
             </div>
 
-            <div className="w-full sm:w-auto">
+            <div className="relative w-full md:w-1/4">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                placeholder="Location (e.g. Remote, NY)"
+                className="w-full h-12 pl-12 pr-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-100 placeholder:text-slate-500 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300"
+                value={location}
+                onChange={handleLocationChange}
+              />
+            </div>
+
+            <div className="w-full md:w-auto flex flex-1 flex-col sm:flex-row gap-4">
               <select 
-                className="w-full h-12 px-5 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-300 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300 cursor-pointer"
+                className="w-full h-12 px-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-300 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300 cursor-pointer"
                 value={category}
                 onChange={handleCategoryChange}
               >
@@ -130,6 +160,17 @@ export default function JobsPage() {
                 {Object.values(JobCategory).map((cat) => (
                   <option key={cat} value={cat}>{cat.replace('_', ' ')}</option>
                 ))}
+              </select>
+
+              <select 
+                className="w-full h-12 px-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-300 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300 cursor-pointer"
+                value={posted}
+                onChange={handlePostedChange}
+              >
+                <option value="">Any Time</option>
+                <option value="24h">Past 24 hours</option>
+                <option value="1w">Past week</option>
+                <option value="1m">Past month</option>
               </select>
             </div>
           </div>
@@ -152,8 +193,8 @@ export default function JobsPage() {
               </svg>
               <p className="font-medium">No jobs found matching your criteria.</p>
               <button 
-                onClick={() => { setSearch(''); setCategory(''); }}
-                className="mt-2 text-sm text-emerald-400 font-semibold hover:text-emerald-300 transition-colors"
+                onClick={() => { setSearch(''); setCategory(''); setLocation(''); setPosted(''); setPage(1); }}
+                className="mt-2 text-sm text-emerald-400 font-semibold hover:text-emerald-300 transition-colors cursor-pointer"
               >
                 Clear all filters
               </button>

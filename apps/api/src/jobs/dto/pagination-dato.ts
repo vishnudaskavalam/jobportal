@@ -21,4 +21,12 @@ export class PaginationDto {
   @IsOptional()
   @IsString()
   category?: JobCategory;
+
+  @IsOptional()
+  @IsString()
+  location?: string;
+
+  @IsOptional()
+  @IsString()
+  posted?: string;
 }

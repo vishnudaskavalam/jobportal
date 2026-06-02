@@ -6,8 +6,8 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  accessToken: localStorage.getItem('accessToken'),
-  refreshToken: localStorage.getItem('refreshToken'),
+  accessToken: localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken'),
+  refreshToken: localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken'),
 };
 
 const authSlice = createSlice({
@@ -19,20 +19,19 @@ const authSlice = createSlice({
       action: PayloadAction<{
         accessToken: string;
         refreshToken: string;
+        rememberMe?: boolean;
       }>,
     ) => {
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
 
-      localStorage.setItem(
-        'accessToken',
-        action.payload.accessToken,
-      );
-
-      localStorage.setItem(
-        'refreshToken',
-        action.payload.refreshToken,
-      );
+      if (action.payload.rememberMe) {
+        localStorage.setItem('accessToken', action.payload.accessToken);
+        localStorage.setItem('refreshToken', action.payload.refreshToken);
+      } else {
+        sessionStorage.setItem('accessToken', action.payload.accessToken);
+        sessionStorage.setItem('refreshToken', action.payload.refreshToken);
+      }
     },
 
     updateAccessToken: (
@@ -41,10 +40,11 @@ const authSlice = createSlice({
     ) => {
       state.accessToken = action.payload;
 
-      localStorage.setItem(
-        'accessToken',
-        action.payload,
-      );
+      if (localStorage.getItem('refreshToken')) {
+        localStorage.setItem('accessToken', action.payload);
+      } else {
+        sessionStorage.setItem('accessToken', action.payload);
+      }
     },
 
       logout: (state) => {
@@ -53,6 +53,8 @@ const authSlice = createSlice({
 
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('refreshToken');
     },
   },
 });

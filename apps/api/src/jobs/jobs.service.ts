@@ -3,13 +3,16 @@ import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JobApplication, JobEntity } from './entities/job.entity';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
+import { UserEntity } from '../users/entities/user.entity';
 
 @Injectable()
 export class JobsService {
    constructor(
     @InjectRepository(JobEntity)
     private readonly jobsRepository: Repository<JobEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
 
   create(data: any) {
@@ -22,6 +25,8 @@ export class JobsService {
   limit = 10,
   category?: string,
   search?: string,
+  location?: string,
+  posted?: string,
 ) {
   const queryBuilder =
     this.jobsRepository.createQueryBuilder('job');
@@ -48,6 +53,32 @@ export class JobsService {
     );
   }
 
+  if (location) {
+    queryBuilder.andWhere(
+      'LOWER(job.location) LIKE LOWER(:location)',
+      { location: `%${location}%` },
+    );
+  }
+
+  if (posted) {
+    const now = new Date();
+    let dateLimit;
+    switch(posted) {
+      case '24h':
+        dateLimit = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        break;
+      case '1w':
+        dateLimit = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case '1m':
+        dateLimit = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        break;
+    }
+    if (dateLimit) {
+      queryBuilder.andWhere('job.createdAt >= :dateLimit', { dateLimit });
+    }
+  }
+
   const [jobs, total] =
     await queryBuilder
       .orderBy('job.createdAt', 'DESC')
@@ -71,10 +102,33 @@ export class JobsService {
   };
 }
 
-  findOne(id: string) {
-    return this.jobsRepository.findOne({
+  async findOne(id: string) {
+    const job = await this.jobsRepository.findOne({
       where: { id },
     });
+    
+    if (job && job.applications && job.applications.length > 0) {
+      const userIds = job.applications.map((app: any) => app.userId);
+      const users = await this.userRepository.find({
+        where: { id: In(userIds) },
+        select: ['id', 'firstName', 'lastName', 'email'],
+      });
+      const userMap = new Map(users.map(u => [u.id, u]));
+      
+      job.applications = job.applications.map((app: any) => {
+        const user = userMap.get(app.userId);
+        return {
+          ...app,
+          user: user ? {
+            id: user.id,
+            name: `${user.firstName} ${user.lastName}`.trim(),
+            email: user.email
+          } : null,
+        };
+      });
+    }
+    
+    return job;
   }
 
    async update(
@@ -92,6 +146,8 @@ export class JobsService {
     jobId: string,
     userId: string,
   ) {
+    console.log(userId);
+    
     const job =
       await this.jobsRepository.findOne({
         where: { id: jobId },
@@ -124,7 +180,7 @@ export class JobsService {
       ...(job.applications || []),
       application,
     ];
-
+console.log(job.applications), userId;
     return this.jobsRepository.save(job);
   }
 

@@ -39,15 +39,13 @@ export default function LoginPage({ onNavigateToHome }: LoginProps) {
       
       if (response.status === 200) {
 
-        // Store token in localStorage if rememberMe is checked
-        if (rememberMe) {
-          dispatch(
-            setTokens({
-              accessToken: data.accessToken,
-              refreshToken: data.refreshToken,
-            }),
-          );
-        }
+        dispatch(
+          setTokens({
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken,
+            rememberMe,
+          }),
+        );
         if(data.user.role === UserRole.ADMIN){
           navigate("/admin");
         } else {
