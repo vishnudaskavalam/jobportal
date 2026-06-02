@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
-import { UsersService } from './users.service.js';
-import { CreateUserDto } from './dto/create-user.dto.js';
-import { UpdateUserDto } from './dto/update-user.dto.js';
+import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserRole } from '@jobportal/types';
-import { AuthGuard } from '../auth/guard/auth.guard.js';
-import { RolesGuard } from '../auth/guard/role.guard.js';
-import { Roles } from '../auth/decorators/roel.decorator.js';
+import { AuthGuard } from '../auth/guard/auth.guard';
+import { RolesGuard } from '../auth/guard/role.guard';
+import { Roles } from '../auth/decorators/roel.decorator';
 
 @Controller('users')
 export class UsersController {

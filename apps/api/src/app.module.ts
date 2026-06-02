@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module.js';
+import { AuthModule } from './auth/auth.module';
 import { JobsModule } from './jobs/jobs.module';
 import { SeedModule } from './seeds/admin-seed.module';
 import { CategoriesModule } from './categories/categories.module';

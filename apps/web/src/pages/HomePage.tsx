@@ -7,17 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import type { RootState } from '../store/store';
 import axiosInstance from '../api/privateApi';
+import JobCard, { type Job } from '../componets/JobCard';
 import Footer from '../componets/layout/footer';
-
-interface Job {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  salary: string;
-  type: string;
-  logoColor: string;
-}
 
 export default function App() {
   const navigate = useNavigate();
@@ -120,38 +111,7 @@ useEffect(() => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {featuredJobs.map((job) => (
-                    <div
-                      key={job.id}
-                      className="bg-slate-900/40 border border-white/5 p-6 rounded-2xl hover:border-emerald-500/20 hover:bg-slate-900/60 hover:shadow-xl transition-all duration-300 flex items-start gap-4 group cursor-pointer"
-                      onClick={() => navigate(`/jobs/${job.id}`)}
-                    >
-                      <div
-                        className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg text-white shadow-md"
-                        style={{ backgroundColor: job.logoColor || '#10B981' }}
-                      >
-                        {job.company.charAt(0)}
-                      </div>
-
-                      <div className="flex-grow flex flex-col gap-1.5">
-                        <span className="text-[13px] font-bold text-emerald-400 tracking-wide uppercase">
-                          {job.type}
-                        </span>
-
-                        <h3 className="text-lg font-bold text-slate-100 group-hover:text-emerald-400 transition-colors">
-                          {job.title}
-                        </h3>
-
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium text-slate-400">
-                          <span>{job.company}</span>
-                          <span className="text-slate-700">•</span>
-                          <span>{job.location}</span>
-                        </div>
-
-                        <span className="text-sm font-bold text-slate-300 mt-1">
-                          {job.salary}
-                        </span>
-                      </div>
-                    </div>
+                    <JobCard key={job.id} job={job as Job} />
                   ))}
                 </div>
             )

@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -8,7 +8,7 @@ import { CategoryEntity } from '../categories/entities/category.entity';
 import { UserRole } from '@jobportal/types';
 
 @Injectable()
-export class AdminSeed implements OnModuleInit {
+export class AdminSeed {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
@@ -16,10 +16,6 @@ export class AdminSeed implements OnModuleInit {
     private readonly categoryRepository: Repository<CategoryEntity>,
   ) {}
 
-  async onModuleInit() {
-    await this.seedAdmin();
-    await this.seedCategories();
-  }
 
   async seedCategories() {
     const count = await this.categoryRepository.count();
