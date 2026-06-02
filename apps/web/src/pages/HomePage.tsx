@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux';
 import type { RootState } from '../store/store';
 import axiosInstance from '../api/privateApi';
 import JobCard, { type Job } from '../componets/JobCard';
+import Button from '../componets/Button';
 import Footer from '../componets/layout/footer';
 
 export default function App() {
@@ -79,13 +80,13 @@ useEffect(() => {
         <section id="jobs" className="flex flex-col gap-6">
           <div className="flex items-center justify-between border-b border-white/5 pb-4">
             <h2 className="text-2xl font-bold tracking-tight text-slate-100">Featured Job Openings</h2>
-            <button
-              type="button"
-              onClick={()=>{navigate('/jobs')}}
-              className="text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer"
+            <Button
+              onClick={() => { navigate('/jobs') }}
+              variant="link"
+              className="text-sm font-bold text-emerald-400 hover:text-emerald-300"
             >
               View all jobs →
-            </button>
+            </Button>
           </div>
 
 

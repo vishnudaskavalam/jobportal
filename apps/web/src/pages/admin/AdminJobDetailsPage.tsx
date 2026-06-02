@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import AdminSidebar from '../../componets/layout/AdminSidebar';
 import axiosInstance from '../../api/privateApi';
+import Button from '../../componets/Button';
 
 import type { RootState } from '../../store/store';
 
@@ -90,12 +91,12 @@ export default function AdminJobDetailsPage() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
           <h2 className="text-2xl font-bold text-slate-200">{error || 'Job not found'}</h2>
-          <button 
+          <Button 
             onClick={() => navigate('/admin/jobs')}
-            className="px-6 py-2 bg-slate-900 border border-white/5 text-slate-300 hover:text-emerald-400 hover:border-emerald-500/30 rounded-lg transition-all"
+            variant="secondary"
           >
             Back to Jobs
-          </button>
+          </Button>
         </main>
       </div>
     );
@@ -114,26 +115,29 @@ export default function AdminJobDetailsPage() {
       <main className="flex-1 flex flex-col min-h-screen z-10 overflow-y-auto">
         <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-slate-950/50 backdrop-blur-md sticky top-0 z-20">
           <div className="flex items-center gap-4">
-            <button 
+            <Button 
               onClick={() => navigate('/admin/jobs')}
-              className="text-slate-400 hover:text-emerald-400 transition-colors"
+              variant="link"
+              className="text-slate-400 hover:text-emerald-400"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-            </button>
+            </Button>
             <h2 className="text-lg font-semibold text-slate-100">Job Details</h2>
           </div>
           <div className="flex items-center gap-3">
-            <button 
+            <Button 
               onClick={() => navigate(`/admin/jobs/${job.id}/edit`)}
-              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-white/5 text-white text-sm font-medium rounded-lg transition-all shadow-[0_0_15px_rgba(255,255,255,0.02)] cursor-pointer flex items-center gap-2"
+              variant="secondary"
+              leftIcon={
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              }
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
               Edit Job
-            </button>
+            </Button>
           </div>
         </header>
 
@@ -254,9 +258,9 @@ export default function AdminJobDetailsPage() {
                       </div>
                     ))}
                     {job.applications.length > 5 && (
-                      <button className="mt-2 text-sm text-emerald-400 font-semibold hover:text-emerald-300 transition-colors">
+                      <Button variant="link" className="mt-2 text-sm text-emerald-400 font-semibold hover:text-emerald-300">
                         View all {job.applications.length} applications →
-                      </button>
+                      </Button>
                     )}
                   </div>
                 ) : (

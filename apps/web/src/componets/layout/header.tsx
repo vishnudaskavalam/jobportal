@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import Button from '../Button';
 
 interface HeaderProps {
     accessToken: string | null;
@@ -22,29 +23,25 @@ export default function Header({ accessToken, onSignInClick }: HeaderProps) {
             </div>
 
             <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
-                <button onClick={() => navigate('/jobs')} className="hover:text-slate-100 transition-colors cursor-pointer">Find Jobs</button>
+                <Button onClick={() => navigate('/jobs')} variant="link">Find Jobs</Button>
             </nav>
 
             <div className="flex items-center gap-4">
                 {accessToken ?
-                    <button
-                        type="button"
+                    <Button
                         onClick={onSignInClick}
-                        className="text-sm font-bold bg-emerald-500 text-white px-5 py-2.5 rounded-xl hover:bg-emerald-600 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all cursor-pointer"
+                        variant="primary"
                     >
-
-Logout                    </button>
+                        Logout
+                    </Button>
                     :
-                    <button
-                        type="button"
+                    <Button
                         onClick={onSignInClick}
-                        className="text-sm font-semibold px-4 py-2 text-slate-300 hover:text-slate-100 transition-colors cursor-pointer"
+                        variant="ghost"
                     >
                         Sign In
-                    </button>
+                    </Button>
                 }
-
-
             </div>
         </header>
     );

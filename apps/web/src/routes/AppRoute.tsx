@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
 import SignupPage from '../pages/SignupPage';
-import AdminDashboardPage from '../pages/AdminDashboardPage';
+import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
 import AdminJobsListPage from '../pages/admin/AdminJobsListPage';
 import AdminJobFormPage from '../pages/admin/AdminJobFormPage';
 import AdminJobDetailsPage from '../pages/admin/AdminJobDetailsPage';

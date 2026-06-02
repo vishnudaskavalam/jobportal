@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import Button from './Button';
 
 export interface Job {
   id: string;
@@ -54,9 +55,9 @@ export default function JobCard({ job }: JobCardProps) {
 
       <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between">
         <span className="text-sm font-extrabold text-slate-200">{job.salary}</span>
-        <button className="text-xs font-bold text-slate-400 group-hover:text-emerald-400 transition-colors">
+        <Button variant="link" className="text-xs font-bold group-hover:text-emerald-400">
           View Details →
-        </button>
+        </Button>
       </div>
     </div>
   );

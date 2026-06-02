@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom';
+import Button from '../componets/Button';
 import axiosInstance from '../api/privateApi';
 import { useDispatch } from 'react-redux';
 import { setTokens } from '../store/authSlice';
@@ -178,29 +179,21 @@ export default function LoginPage({ onNavigateToHome }: LoginProps) {
             <a href="#forgot" className="font-semibold text-emerald-400 hover:text-emerald-300 hover:underline transition-all">Forgot password?</a>
           </div>
 
-          <button
+          <Button
             type="submit"
-            disabled={status === 'loading'}
-            className="w-full h-12 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 hover:shadow-[0_4px_25px_rgba(16,185,129,0.25)] hover:-translate-y-0.5 active:translate-y-0.5 disabled:bg-emerald-500/50 disabled:translate-y-0 disabled:shadow-none flex items-center justify-center gap-2 cursor-pointer transition-all duration-300"
+            variant="primary"
+            fullWidth
+            isLoading={status === 'loading'}
+            className="h-12 hover:-translate-y-0.5 active:translate-y-0.5"
           >
-            {status === 'loading' ? (
-              <>
-                <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                <span>Signing in...</span>
-              </>
-            ) : (
-              'Sign In'
-            )}
-          </button>
+            {status === 'loading' ? 'Signing in...' : 'Sign In'}
+          </Button>
         </form>
 
         {/* Footer */}
         <div className="text-center text-sm text-slate-400 mt-2 font-medium">
           Don't have an account?
-          <button onClick={() => navigate('/signup')} className="text-emerald-400 hover:text-emerald-300 font-bold ml-1.5 hover:underline transition-all cursor-pointer">Sign up</button>
+          <Button variant="link" onClick={() => navigate('/signup')} className="text-emerald-400 hover:text-emerald-300 font-bold ml-1.5 hover:underline">Sign up</Button>
         </div>
       </div>
 

@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../componets/layout/AdminSidebar';
 import axiosInstance from '../../api/privateApi';
+import SearchBar from '../../componets/SearchBar';
+import Dropdown from '../../componets/Dropdown';
+import Pagination, { type MetaData } from '../../componets/Pagination';
+import Button from '../../componets/Button';
 
 
 interface Job {
@@ -16,14 +20,7 @@ interface Job {
   createdAt: string;
 }
 
-interface MetaData {
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
+
 
 
 
@@ -115,14 +112,16 @@ export default function AdminJobsListPage() {
         <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-slate-950/50 backdrop-blur-md">
           <h2 className="text-lg font-semibold text-slate-100">Jobs Management</h2>
           <div className="flex items-center gap-4">
-            <button 
+            <Button 
               onClick={() => navigate('/admin/jobs/new')}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.3)] cursor-pointer">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-              </svg>
+              variant="primary"
+              leftIcon={
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+              }>
               Post Job
-            </button>
+            </Button>
           </div>
         </header>
 
@@ -130,32 +129,21 @@ export default function AdminJobsListPage() {
           
           {/* Filters Bar */}
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-slate-900/60 backdrop-blur-xl border border-white/5 p-4 rounded-2xl">
-            <div className="relative w-full sm:w-96">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <input
-                type="text"
-                placeholder="Search jobs, companies, locations..."
-                className="w-full h-11 pl-10 pr-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-100 placeholder:text-slate-500 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300"
-                value={search}
-                onChange={handleSearch}
-              />
-            </div>
+            <SearchBar
+              value={search}
+              onChange={handleSearch}
+              placeholder="Search jobs, companies, locations..."
+              className="w-full sm:w-96"
+            />
 
             <div className="flex items-center gap-3 w-full sm:w-auto">
-              <select 
-                className="h-11 px-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-300 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300 cursor-pointer w-full sm:w-auto"
+              <Dropdown
                 value={category}
                 onChange={handleCategoryChange}
-              >
-                <option value="">All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
+                options={categories.map((c) => ({ value: c.id, label: c.name }))}
+                placeholder="All Categories"
+                className="w-full sm:w-auto h-11"
+              />
             </div>
           </div>
 
@@ -223,29 +211,35 @@ export default function AdminJobsListPage() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button 
+                            <Button 
                               onClick={() => navigate(`/admin/jobs/${job.id}`)}
                               title="View Details"
-                              className="p-2 text-slate-400 hover:text-blue-400 bg-slate-900 rounded-lg border border-white/5 hover:border-blue-500/30 transition-all cursor-pointer">
+                              variant="secondary"
+                              size="icon"
+                              className="hover:text-blue-400 hover:border-blue-500/30">
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                               </svg>
-                            </button>
-                            <button 
+                            </Button>
+                            <Button 
                               onClick={() => navigate(`/admin/jobs/${job.id}/edit`)}
-                              className="p-2 text-slate-400 hover:text-emerald-400 bg-slate-900 rounded-lg border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer">
+                              variant="secondary"
+                              size="icon"
+                              className="hover:text-emerald-400 hover:border-emerald-500/30">
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                               </svg>
-                            </button>
-                            <button 
+                            </Button>
+                            <Button 
                               onClick={() => handleDelete(job.id)}
-                              className="p-2 text-slate-400 hover:text-rose-400 bg-slate-900 rounded-lg border border-white/5 hover:border-rose-500/30 transition-all cursor-pointer">
+                              variant="secondary"
+                              size="icon"
+                              className="hover:text-rose-400 hover:border-rose-500/30">
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                               </svg>
-                            </button>
+                            </Button>
                           </div>
                         </td>
                       </tr>
@@ -256,52 +250,8 @@ export default function AdminJobsListPage() {
             </div>
 
             {/* Pagination */}
-            {!loading && meta && (
-              <div className="mt-auto px-6 py-4 border-t border-white/5 flex items-center justify-between bg-slate-950/30">
-                <p className="text-sm text-slate-400 font-medium">
-                  Showing <span className="text-slate-200 font-bold">{Math.min((meta.page - 1) * meta.limit + 1, meta.total)}</span> to <span className="text-slate-200 font-bold">{Math.min(meta.page * meta.limit, meta.total)}</span> of <span className="text-slate-200 font-bold">{meta.total}</span> jobs
-                </p>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                    disabled={!meta.hasPreviousPage}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-900 border border-white/5 text-sm font-medium text-slate-300 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    Prev
-                  </button>
-                  
-                  {/* Page Numbers */}
-                  <div className="flex items-center gap-1 hidden sm:flex">
-                    {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNum) => (
-                      <button
-                        key={pageNum}
-                        onClick={() => setPage(pageNum)}
-                        className={`w-8 h-8 rounded-lg text-sm font-bold flex items-center justify-center transition-colors ${
-                          pageNum === meta.page 
-                            ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' 
-                            : 'bg-slate-900 border border-white/5 text-slate-400 hover:bg-slate-800 hover:text-slate-200 cursor-pointer'
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    ))}
-                  </div>
-
-                  <button
-                    onClick={() => setPage(p => Math.min(meta.totalPages, p + 1))}
-                    disabled={!meta.hasNextPage}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-900 border border-white/5 text-sm font-medium text-slate-300 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                  >
-                    Next
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
+            {!loading && (
+              <Pagination meta={meta} onPageChange={setPage} showInfo={true} />
             )}
           </div>
         </div>

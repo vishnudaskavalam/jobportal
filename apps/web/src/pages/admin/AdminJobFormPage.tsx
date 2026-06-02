@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import AdminSidebar from '../../componets/layout/AdminSidebar';
 import axiosInstance from '../../api/privateApi';
+import Button from '../../componets/Button';
 
 import type { RootState } from '../../store/store';
 import ReactQuill from 'react-quill-new';
@@ -139,14 +140,15 @@ export default function AdminJobFormPage() {
       <main className="flex-1 flex flex-col min-h-screen z-10">
         <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-slate-950/50 backdrop-blur-md">
           <div className="flex items-center gap-4">
-            <button 
+            <Button 
               onClick={() => navigate('/admin/jobs')}
-              className="p-2 text-slate-400 hover:text-emerald-400 bg-slate-900 rounded-lg border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer"
+              variant="secondary"
+              size="icon"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
-            </button>
+            </Button>
             <h2 className="text-lg font-semibold text-slate-100">
               {isEditMode ? 'Edit Job' : 'Create New Job'}
             </h2>
@@ -337,23 +339,14 @@ export default function AdminJobFormPage() {
 
               {/* Submit Button */}
               <div className="flex justify-end pt-4 border-t border-white/5 mt-2">
-                <button
+                <Button
                   type="submit"
-                  disabled={status === 'loading'}
-                  className="px-8 h-12 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 hover:shadow-[0_4px_25px_rgba(16,185,129,0.25)] hover:-translate-y-0.5 active:translate-y-0.5 disabled:bg-emerald-500/50 disabled:translate-y-0 disabled:shadow-none flex items-center justify-center gap-2 cursor-pointer transition-all duration-300"
+                  variant="primary"
+                  isLoading={status === 'loading'}
+                  className="px-8 h-12 hover:-translate-y-0.5 active:translate-y-0.5"
                 >
-                  {status === 'loading' ? (
-                    <>
-                      <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      <span>Saving...</span>
-                    </>
-                  ) : (
-                    isEditMode ? 'Update Job' : 'Create Job'
-                  )}
-                </button>
+                  {status === 'loading' ? 'Saving...' : (isEditMode ? 'Update Job' : 'Create Job')}
+                </Button>
               </div>
 
             </form>
