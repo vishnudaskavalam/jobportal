@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import axiosInstance from '../../api/privateApi';
-import Button from '../../componets/Button';
+import { useGetCategoriesQuery } from '../../store/endpoints/categoriesApi';
+import { useGetJobByIdQuery, useCreateJobMutation, useUpdateJobMutation } from '../../store/endpoints/jobsApi';
 
 import type { RootState } from '../../store/store';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
+import Button from '../../componets/ui/Button';
 
 // We must manually duplicate JobType enum since it's defined in api/src/jobs/entities/job.entity.ts
 // In a real monorepo, we'd move JobType to @jobportal/types to share it.
@@ -35,58 +36,38 @@ export default function AdminJobFormPage() {
     company: '',
     location: '',
     salary: '',
-    type: JobType.FULL_TIME,
+    type: JobType.FULL_TIME as JobType,
     categoryId: '',
     logoColor: '#10B981',
     isFeatured: false,
     description: '',
   });
 
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const { data: categories = [] } = useGetCategoriesQuery();
+  const { data: job } = useGetJobByIdQuery(id as string, { skip: !isEditMode });
+  const [createJob] = useCreateJobMutation();
+  const [updateJob] = useUpdateJobMutation();
+
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    fetchCategories();
-    if (isEditMode) {
-      fetchJobDetails();
-    }
-  }, [isEditMode, id]);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await axiosInstance.get('/categories');
-      setCategories(response.data);
-      if (!isEditMode && response.data.length > 0) {
-        setFormData(prev => ({ ...prev, categoryId: response.data[0].id }));
-      }
-    } catch (error) {
-      console.error('Failed to fetch categories', error);
-    }
-  };
-
-  const fetchJobDetails = async () => {
-    setStatus('loading');
-    try {
-      const response = await axiosInstance.get(`/jobs/${id}`);
-      const job = response.data;
+    if (job) {
       setFormData({
         title: job.title || '',
         company: job.company || '',
         location: job.location || '',
         salary: job.salary || '',
-        type: job.type || JobType.FULL_TIME,
+        type: (job.type as JobType) || JobType.FULL_TIME,
         categoryId: job.category?.id || '',
         logoColor: job.logoColor || '#10B981',
         isFeatured: job.isFeatured || false,
-        description: job.description || '',
+        description: (job as any).description || '',
       });
-      setStatus('idle');
-    } catch (error: any) {
-      setStatus('error');
-      setMessage(error.response?.data?.message || 'Failed to load job details.');
+    } else if (categories.length > 0 && !isEditMode && !formData.categoryId) {
+      setFormData(prev => ({ ...prev, categoryId: categories[0].id }));
     }
-  };
+  }, [job, categories, isEditMode]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -109,10 +90,10 @@ export default function AdminJobFormPage() {
 
     try {
       if (isEditMode) {
-        await axiosInstance.patch(`/jobs/${id}`, formData);
+        await updateJob({ id: id as string, data: formData }).unwrap();
         setMessage('Job updated successfully!');
       } else {
-        await axiosInstance.post('/jobs', formData);
+        await createJob(formData).unwrap();
         setMessage('Job created successfully!');
       }
       setStatus('success');
@@ -122,7 +103,7 @@ export default function AdminJobFormPage() {
       }, 1500);
     } catch (error: any) {
       setStatus('error');
-      setMessage(error.response?.data?.message || 'An error occurred while saving the job.');
+      setMessage(error?.data?.message || 'An error occurred while saving the job.');
     }
   };
 
@@ -130,7 +111,7 @@ export default function AdminJobFormPage() {
     <>
         <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-slate-950/50 backdrop-blur-md">
           <div className="flex items-center gap-4">
-            <Button 
+            <Button
               onClick={() => navigate('/admin/jobs')}
               variant="secondary"
               size="icon"

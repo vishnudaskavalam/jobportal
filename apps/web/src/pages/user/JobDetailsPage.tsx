@@ -1,25 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import axiosInstance from '../../api/privateApi';
-import Button from '../../componets/Button';
-
+import { useGetJobByIdQuery, useApplyForJobMutation } from '../../store/endpoints/jobsApi';
 import type { RootState } from '../../store/store';
-
-interface Job {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  salary: string;
-  type: string;
-  category: { id: string; name: string };
-  logoColor: string;
-  isFeatured: boolean;
-  createdAt: string;
-  applications?: any[];
-  description?: string;
-}
+import Button from '../../componets/ui/Button';
 
 export default function JobDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -27,26 +11,10 @@ export default function JobDetailsPage() {
 
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
-  const [job, setJob] = useState<Job | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: job, isLoading: loading } = useGetJobByIdQuery(id as string, { skip: !id });
+  const [applyForJob] = useApplyForJobMutation();
   const [applyStatus, setApplyStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    fetchJobDetails();
-  }, [id]);
-
-  const fetchJobDetails = async () => {
-    setLoading(true);
-    try {
-      const response = await axiosInstance.get(`/jobs/${id}`);
-      setJob(response.data);
-    } catch (error) {
-      console.error('Failed to fetch job details:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleApply = async () => {
     if (!accessToken) {
@@ -58,12 +26,12 @@ export default function JobDetailsPage() {
     setMessage('');
 
     try {
-      await axiosInstance.post(`/jobs/${id}/apply`,);
+      await applyForJob(id as string).unwrap();
       setApplyStatus('success');
       setMessage('Successfully applied for this position!');
     } catch (error: any) {
       setApplyStatus('error');
-      setMessage(error.response?.data?.message || 'Failed to apply. You may have already applied.');
+      setMessage(error?.data?.message || 'Failed to apply. You may have already applied.');
     }
   };
 

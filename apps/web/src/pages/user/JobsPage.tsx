@@ -1,19 +1,15 @@
-import { useEffect, useState } from 'react';
-import axiosInstance from '../../api/privateApi';
-import JobCard, { type Job } from '../../componets/JobCard';
-import SearchBar from '../../componets/SearchBar';
-import Dropdown from '../../componets/Dropdown';
-import Pagination, { type MetaData } from '../../componets/Pagination';
-import Button from '../../componets/Button';
+import { useState } from 'react';
+import { useGetJobsQuery } from '../../store/endpoints/jobsApi';
+import JobCard from '../../componets/ui/JobCard';
+import SearchBar from '../../componets/ui/SearchBar';
+import Dropdown from '../../componets/ui/Dropdown';
+import Pagination from '../../componets/ui/Pagination';
+import Button from '../../componets/ui/Button';
+import { useGetCategoriesQuery } from '../../store';
 
 
 
 export default function JobsPage() {
-
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [meta, setMeta] = useState<MetaData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
 
   // Filters & Pagination
   const [page, setPage] = useState(1);
@@ -23,44 +19,19 @@ export default function JobsPage() {
   const [location, setLocation] = useState('');
   const [posted, setPosted] = useState('');
 
-  const fetchCategories = async () => {
-    try {
-      const response = await axiosInstance.get('/categories');
-      setCategories(response.data);
-    } catch (error) {
-      console.error('Failed to fetch categories:', error);
-    }
-  };
+  const { data: jobsResponse, isLoading: loadingJobs, isFetching } = useGetJobsQuery({
+    page,
+    limit,
+    ...(search && { search }),
+    ...(category && { category }),
+    ...(location && { location }),
+    ...(posted && { posted }),
+  });
+  const jobs = jobsResponse?.data || [];
+  const meta = jobsResponse?.meta || null;
+  const loading = loadingJobs || isFetching;
 
-  const fetchJobs = async () => {
-    setLoading(true);
-    try {
-      const response = await axiosInstance.get('/jobs/list', {
-        params: {
-          page,
-          limit,
-          ...(search && { search }),
-          ...(category && { category }),
-          ...(location && { location }),
-          ...(posted && { posted }),
-        }
-      });
-      setJobs(response.data.data);
-      setMeta(response.data.meta);
-    } catch (error) {
-      console.error('Failed to fetch jobs:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    fetchJobs();
-  }, [page, search, category, location, posted]);
+  const { data: categories = [] } = useGetCategoriesQuery();
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);

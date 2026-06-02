@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { publicApi } from '../../api/publicApi';
-import Button from '../../componets/Button';
+import { useSignupMutation } from '../../store/endpoints/authApi';
+import Button from '../../componets/ui/Button';
 
 export default function SignupPage() {
   const [firstName, setFirstName] = useState('')
@@ -13,9 +13,11 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
 
   // Notification states
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
   const navigate = useNavigate();
+
+  const [signupMutation, { isLoading }] = useSignupMutation();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -26,31 +28,26 @@ export default function SignupPage() {
       return
     }
 
-    setStatus('loading')
+    setStatus('idle')
     setMessage('')
 
     try {
-      const response = await publicApi.post('/auth/signup', {
+      await signupMutation({
         firstName,
         lastName,
         phone,
         email,
         password
-      });
+      }).unwrap();
 
-      if (response.status === 201 || response.status === 200) {
-        setStatus('success')
-        setMessage('Account created successfully! Redirecting to login...')
-        setTimeout(() => {
-          navigate('/login')
-        }, 1500)
-      } else {
-        setStatus('error')
-        setMessage(response.data.message || 'Signup failed. Please try again.')
-      }
+      setStatus('success')
+      setMessage('Account created successfully! Redirecting to login...')
+      setTimeout(() => {
+        navigate('/login')
+      }, 1500)
     } catch (err: any) {
       setStatus('error')
-      setMessage(err.response?.data?.message || 'Failed to connect to authentication server.')
+      setMessage(err?.data?.message || 'Failed to connect to authentication server.')
     }
   }
 
@@ -91,7 +88,7 @@ export default function SignupPage() {
               id="firstName"
               type="text"
               required
-              disabled={status === 'loading'}
+              disabled={isLoading}
               className="w-full h-11 px-4 bg-slate-950 border border-white/5 rounded-xl text-[14px] font-medium text-slate-100 placeholder:text-slate-600 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300"
               placeholder="First"
               value={firstName}
@@ -104,7 +101,7 @@ export default function SignupPage() {
               id="lastName"
               type="text"
               required
-              disabled={status === 'loading'}
+              disabled={isLoading}
               className="w-full h-11 px-4 bg-slate-950 border border-white/5 rounded-xl text-[14px] font-medium text-slate-100 placeholder:text-slate-600 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300"
               placeholder="Last"
               value={lastName}
@@ -119,7 +116,7 @@ export default function SignupPage() {
             id="phone"
             type="tel"
             required
-            disabled={status === 'loading'}
+            disabled={isLoading}
             className="w-full h-11 px-4 bg-slate-950 border border-white/5 rounded-xl text-[14px] font-medium text-slate-100 placeholder:text-slate-600 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300"
             placeholder="+1 (555) 000-0000"
             value={phone}
@@ -133,7 +130,7 @@ export default function SignupPage() {
             id="email"
             type="email"
             required
-            disabled={status === 'loading'}
+            disabled={isLoading}
             className="w-full h-11 px-4 bg-slate-950 border border-white/5 rounded-xl text-[14px] font-medium text-slate-100 placeholder:text-slate-600 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300"
             placeholder="name@company.com"
             value={email}
@@ -148,7 +145,7 @@ export default function SignupPage() {
               id="password"
               type={showPassword ? 'text' : 'password'}
               required
-              disabled={status === 'loading'}
+              disabled={isLoading}
               className="w-full h-11 pl-4 pr-12 bg-slate-950 border border-white/5 rounded-xl text-[14px] font-medium text-slate-100 placeholder:text-slate-600 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300"
               placeholder="••••••••"
               value={password}
@@ -179,10 +176,10 @@ export default function SignupPage() {
           type="submit"
           variant="primary"
           fullWidth
-          isLoading={status === 'loading'}
+          isLoading={isLoading}
           className="h-11 mt-2 hover:-translate-y-0.5 active:translate-y-0.5"
         >
-          {status === 'loading' ? 'Creating Account...' : 'Sign Up'}
+          {isLoading ? 'Creating Account...' : 'Sign Up'}
         </Button>
       </form>
 

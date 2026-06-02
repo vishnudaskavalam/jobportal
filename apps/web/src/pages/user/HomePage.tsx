@@ -1,32 +1,12 @@
-import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../../api/privateApi';
-import JobCard, { type Job } from '../../componets/JobCard';
-import Button from '../../componets/Button';
+import JobCard, { type Job } from '../../componets/ui/JobCard';
+import Button from '../../componets/ui/Button';
+import { useGetJobsQuery } from '../../store/endpoints/jobsApi';
 
 export default function App() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-
-  const [featuredJobs, setFeaturedJobs] = useState<Job[]>([]);
-
-  const fetchJobs = async () => {
-    setLoading(true);
-    try {
-      const response = await axiosInstance.get(`/jobs/list`, { params: { isFeatured: true } });
-      setFeaturedJobs(response.data.data);
-      console.log(response.data.data);
-    } catch (error: any) {
-      console.error('Failed to fetch jobs:', error);
-
-    } finally {
-      setLoading(false);
-    }
-  };
-  useEffect(() => {
-    fetchJobs();
-  }, []);
-
+  const { data: response, isLoading: loading } = useGetJobsQuery({ isFeatured: true });
+  const featuredJobs = response?.data || [];
 
   return (
     <>

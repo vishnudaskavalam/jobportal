@@ -1,37 +1,9 @@
-import { useEffect, useState } from 'react';
-import axiosInstance from '../../api/privateApi';
+import { useGetUserCountQuery } from '../../store/endpoints/usersApi';
+import { useGetJobCountQuery } from '../../store/endpoints/jobsApi';
 
 export default function AdminDashboardPage() {
-
-  const [totalUser, setTotalUser] = useState();
-  const [totalJob, setTotalJob] = useState();
-
-  async function gettotaluser() {
-    try {
-      const response = await axiosInstance.get('/users/count', {
-
-      });
-      setTotalUser(response.data);
-    } catch (error) {
-      console.error('Failed to fetch total users:', error);
-    }
-  }
-
-  async function getActiveJobs() {
-    try {
-      const response = await axiosInstance.get('/jobs/count', {
-
-      });
-      setTotalJob(response.data);
-    } catch (error) {
-      console.error('Failed to fetch total jobs:', error);
-    }
-  }
-
-  useEffect(() => {
-    gettotaluser();
-    getActiveJobs();
-  }, [])
+  const { data: totalUser = 0 } = useGetUserCountQuery();
+  const { data: totalJob = 0 } = useGetJobCountQuery();
 
   return (
     <>

@@ -1,68 +1,17 @@
-import { useEffect, useState } from 'react';
+
 import { useParams, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import axiosInstance from '../../api/privateApi';
-import Button from '../../componets/Button';
+import { useGetJobByIdQuery } from '../../store/endpoints/jobsApi';
+import Button from '../../componets/ui/Button';
 
-import type { RootState } from '../../store/store';
 
-interface JobApplication {
-  userId: string;
-  status: string;
-  appliedAt: string;
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-  };
-}
 
-interface Job {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  salary: string;
-  type: string;
-  category: { id: string; name: string };
-  logoColor: string;
-  isFeatured: boolean;
-  JobStatus: string;
-  description?: string;
-  createdAt: string;
-  applications?: JobApplication[];
-}
 
 export default function AdminJobDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
-  const [job, setJob] = useState<Job | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    if (!accessToken) {
-      navigate('/login');
-    }
-  }, [accessToken, navigate]);
-
-  useEffect(() => {
-    const fetchJobDetails = async () => {
-      setLoading(true);
-      try {
-        const response = await axiosInstance.get(`/jobs/${id}`);
-        setJob(response.data);
-      } catch (err: any) {
-        setError(err.response?.data?.message || 'Failed to load job details.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchJobDetails();
-  }, [id]);
+  const { data: job, isLoading: loading, error: fetchError } = useGetJobByIdQuery(id as string, { skip: !id });
+  const error = fetchError ? (fetchError as any)?.data?.message || 'Failed to load job details.' : '';
 
   if (loading) {
     return (

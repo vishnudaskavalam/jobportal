@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { storage } from '../lib/storage';
 
-const privateApi = axios.create({
+const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-privateApi.interceptors.request.use((config) => {
+axiosInstance.interceptors.request.use((config) => {
   const token = storage.getAccessToken();
 
   if (token) {
@@ -15,7 +15,7 @@ privateApi.interceptors.request.use((config) => {
   return config;
 });
 
-privateApi.interceptors.response.use(
+axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
@@ -42,7 +42,7 @@ privateApi.interceptors.response.use(
         originalRequest.headers.Authorization =
           `Bearer ${newAccessToken}`;
 
-        return privateApi(originalRequest);
+        return axiosInstance(originalRequest);
       } catch (refreshError) {
         storage.clear();
         window.location.href = '/login';
@@ -53,4 +53,4 @@ privateApi.interceptors.response.use(
   },
 );
 
-export default privateApi;
+export default axiosInstance;

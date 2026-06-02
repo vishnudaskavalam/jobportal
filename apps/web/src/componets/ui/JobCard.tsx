@@ -1,6 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import Button from './Button';
 
+export interface JobApplication {
+  userId: string;
+  status: string;
+  appliedAt: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
 export interface Job {
   id: string;
   title: string;
@@ -11,7 +22,10 @@ export interface Job {
   category: { id: string; name: string };
   logoColor: string;
   isFeatured?: boolean;
-  createdAt?: string;
+  createdAt: string;
+  description?: string;
+  JobStatus?: string;
+  applications?: JobApplication[];
 }
 
 interface JobCardProps {

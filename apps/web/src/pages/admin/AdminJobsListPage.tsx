@@ -1,91 +1,47 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../../api/privateApi';
-import SearchBar from '../../componets/SearchBar';
-import Dropdown from '../../componets/Dropdown';
-import Pagination, { type MetaData } from '../../componets/Pagination';
-import Button from '../../componets/Button';
-
-
-interface Job {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  salary: string;
-  type: string;
-  category: { id: string; name: string };
-  isFeatured: boolean;
-  createdAt: string;
-}
-
-
-
+import { useGetAdminJobsQuery, useDeleteJobMutation } from '../../store/endpoints/jobsApi';
+import { useGetCategoriesQuery } from '../../store/endpoints/categoriesApi';
+import Button from '../../componets/ui/Button';
+import SearchBar from '../../componets/ui/SearchBar';
+import Dropdown from '../../componets/ui/Dropdown';
+import Pagination from '../../componets/ui/Pagination';
 
 
 export default function AdminJobsListPage() {
   const navigate = useNavigate();
 
-
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [meta, setMeta] = useState<MetaData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
-  
   // Filters & Pagination
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string>('');
 
-  const fetchCategories = async () => {
-    try {
-      const response = await axiosInstance.get('/categories');
-      setCategories(response.data);
-    } catch (error) {
-      console.error('Failed to fetch categories:', error);
-    }
-  };
 
-  const fetchJobs = async () => {
-    setLoading(true);
-    try {
-      const response = await axiosInstance.get('/jobs', {
-        params: {
-          page,
-          limit,
-          ...(search && { search }),
-          ...(category && { category }),
-        }
-      });
-      setJobs(response.data.data);
-      setMeta(response.data.meta);
-    } catch (error) {
-      console.error('Failed to fetch jobs:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: jobsResponse, isLoading: loadingJobs, isFetching } = useGetAdminJobsQuery({
+    page,
+    limit,
+    ...(search && { search }),
+    ...(category && { category }),
+  });
+  const jobs = jobsResponse?.data || [];
+  const meta = jobsResponse?.meta || null;
+  const loading = loadingJobs || isFetching;
+
+  const { data: categories = [] } = useGetCategoriesQuery();
+
+  const [deleteJob] = useDeleteJobMutation();
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this job?')) {
       try {
-        await axiosInstance.delete(`/jobs/${id}`);
-        fetchJobs();
+        await deleteJob(id).unwrap();
       } catch (error) {
         console.error('Error deleting job:', error);
         alert('Failed to delete job');
       }
     }
   };
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    fetchJobs();
-  }, [page, search, category]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -102,7 +58,7 @@ export default function AdminJobsListPage() {
         <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-slate-950/50 backdrop-blur-md">
           <h2 className="text-lg font-semibold text-slate-100">Jobs Management</h2>
           <div className="flex items-center gap-4">
-            <Button 
+            <Button
               onClick={() => navigate('/admin/jobs/new')}
               variant="primary"
               leftIcon={

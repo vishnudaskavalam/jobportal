@@ -19,7 +19,7 @@ export default function Pagination({ meta, onPageChange, showInfo = false }: Pag
 
   return (
     <div className={`mt-auto pt-4 flex items-center ${showInfo ? 'justify-between border-t border-white/5 px-6 py-4 bg-slate-950/30' : 'justify-center'} gap-2 w-full`}>
-      
+
       {showInfo && (
         <p className="text-sm text-slate-400 font-medium hidden sm:block">
           Showing <span className="text-slate-200 font-bold">{Math.min((meta.page - 1) * meta.limit + 1, meta.total)}</span> to <span className="text-slate-200 font-bold">{Math.min(meta.page * meta.limit, meta.total)}</span> of <span className="text-slate-200 font-bold">{meta.total}</span> jobs
@@ -38,7 +38,7 @@ export default function Pagination({ meta, onPageChange, showInfo = false }: Pag
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </Button>
-        
+
         {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNum) => (
           <Button
             key={pageNum}

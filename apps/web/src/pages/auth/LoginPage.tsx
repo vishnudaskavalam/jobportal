@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom';
-import Button from '../../componets/Button';
-import axiosInstance from '../../api/privateApi';
 import { useDispatch } from 'react-redux';
+import { useLoginMutation } from '../../store/endpoints/authApi';
 import { setTokens } from '../../store/authSlice';
 import { UserRole } from '@jobportal/types';
+import Button from '../../componets/ui/Button';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -13,10 +13,12 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   // Notification states
-  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'error'>('idle')
   const [message, setMessage] = useState('')
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const [loginMutation, { isLoading }] = useLoginMutation();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -27,41 +29,27 @@ export default function LoginPage() {
       return
     }
 
-    setStatus('loading')
+    setStatus('idle')
     setMessage('')
 
     try {
-      const response = await axiosInstance.post('/auth/login', { email, password });
-      const data = response.data;
+      const data = await loginMutation({ email, password }).unwrap();
 
-      if (response.status === 200) {
-
-        dispatch(
-          setTokens({
-            accessToken: data.accessToken,
-            refreshToken: data.refreshToken,
-            rememberMe,
-          }),
-        );
-        if (data.user.role === UserRole.ADMIN) {
-          navigate("/admin");
-        } else {
-          navigate("/");
-        }
+      dispatch(
+        setTokens({
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+          rememberMe,
+        }),
+      );
+      if (data.user.role === UserRole.ADMIN) {
+        navigate("/admin");
       } else {
-        setStatus('error')
-        setMessage(data.message || 'Invalid email or password.')
+        navigate("/");
       }
-    } catch (err) {
-      // Fallback to demo local validation if backend is not running or has CORS block
-      setTimeout(() => {
-        if (email === 'admin@jobportal.com' && password === 'password123') {
-          setMessage('Welcome back! Demo login successful.')
-        } else {
-          setStatus('error')
-          setMessage('Failed to connect to authentication server. (Demo credentials: admin@jobportal.com / password123)')
-        }
-      }, 1000)
+    } catch (err: any) {
+        setStatus('error')
+        setMessage(err?.data?.message || 'Invalid email or password.')
     }
   }
 
@@ -96,7 +84,7 @@ export default function LoginPage() {
               id="email"
               type="email"
               required
-              disabled={status === 'loading'}
+              disabled={isLoading}
               className="w-full h-12 pl-12 pr-4 bg-slate-950 border border-white/5 rounded-xl text-[15px] font-medium text-slate-100 placeholder:text-slate-600 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-300"
               placeholder="name@company.com"
               value={email}
@@ -116,7 +104,7 @@ export default function LoginPage() {
               id="password"
               type={showPassword ? 'text' : 'password'}
               required
-              disabled={status === 'loading'}
+              disabled={isLoading}
               className="w-full h-12 pl-12 pr-12 bg-slate-950 border border-white/5 rounded-xl text-[15px] font-medium text-slate-100 placeholder:text-slate-600 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-300"
               placeholder="••••••••"
               value={password}
@@ -150,21 +138,20 @@ export default function LoginPage() {
               className="appearance-none w-[18px] h-[18px] border border-white/10 rounded-md bg-slate-950 checked:bg-emerald-500 checked:border-emerald-500 cursor-pointer relative checked:after:content-[''] checked:after:absolute checked:after:left-[5px] checked:after:top-[2px] checked:after:w-[5px] checked:after:height-[9px] checked:after:border-white checked:after:border-r-2 checked:after:border-b-2 checked:after:rotate-45 transition-all"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
-              disabled={status === 'loading'}
+              disabled={isLoading}
             />
             <span>Remember me</span>
           </label>
-          <a href="#forgot" className="font-semibold text-emerald-400 hover:text-emerald-300 hover:underline transition-all">Forgot password?</a>
         </div>
 
         <Button
           type="submit"
           variant="primary"
           fullWidth
-          isLoading={status === 'loading'}
+          isLoading={isLoading}
           className="h-12 hover:-translate-y-0.5 active:translate-y-0.5"
         >
-          {status === 'loading' ? 'Signing in...' : 'Sign In'}
+          {isLoading ? 'Signing in...' : 'Sign In'}
         </Button>
       </form>
 
