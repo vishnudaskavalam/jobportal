@@ -3,19 +3,20 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import AdminSidebar from '../../componets/layout/AdminSidebar';
 import axiosInstance from '../../api/privateApi';
-import { JobCategory } from '@jobportal/types';
+
 import type { RootState } from '../../store/store';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 
 // We must manually duplicate JobType enum since it's defined in api/src/jobs/entities/job.entity.ts
 // In a real monorepo, we'd move JobType to @jobportal/types to share it.
-export enum JobType {
-  FULL_TIME = 'FULL_TIME',
-  PART_TIME = 'PART_TIME',
-  CONTRACT = 'CONTRACT',
-  INTERNSHIP = 'INTERNSHIP',
-}
+export const JobType = {
+  FULL_TIME: 'FULL_TIME',
+  PART_TIME: 'PART_TIME',
+  CONTRACT: 'CONTRACT',
+  INTERNSHIP: 'INTERNSHIP',
+} as const;
+export type JobType = typeof JobType[keyof typeof JobType];
 
 export default function AdminJobFormPage() {
   const navigate = useNavigate();
@@ -35,20 +36,34 @@ export default function AdminJobFormPage() {
     location: '',
     salary: '',
     type: JobType.FULL_TIME,
-    category: JobCategory.ENGINEERING,
+    categoryId: '',
     logoColor: '#10B981',
     isFeatured: false,
     description: '',
   });
 
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
+    fetchCategories();
     if (isEditMode) {
       fetchJobDetails();
     }
   }, [isEditMode, id]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axiosInstance.get('/categories');
+      setCategories(response.data);
+      if (!isEditMode && response.data.length > 0) {
+        setFormData(prev => ({ ...prev, categoryId: response.data[0].id }));
+      }
+    } catch (error) {
+      console.error('Failed to fetch categories', error);
+    }
+  };
 
   const fetchJobDetails = async () => {
     setStatus('loading');
@@ -61,7 +76,7 @@ export default function AdminJobFormPage() {
         location: job.location || '',
         salary: job.salary || '',
         type: job.type || JobType.FULL_TIME,
-        category: job.category || JobCategory.ENGINEERING,
+        categoryId: job.category?.id || '',
         logoColor: job.logoColor || '#10B981',
         isFeatured: job.isFeatured || false,
         description: job.description || '',
@@ -250,16 +265,17 @@ export default function AdminJobFormPage() {
                 <div className="flex flex-col gap-2">
                   <label className="text-[13px] font-semibold text-slate-300 tracking-wide" htmlFor="category">Category</label>
                   <select
-                    id="category"
-                    name="category"
+                    id="categoryId"
+                    name="categoryId"
                     required
-                    disabled={status === 'loading'}
-                    value={formData.category}
+                    disabled={status === 'loading' || categories.length === 0}
+                    value={formData.categoryId}
                     onChange={handleChange}
                     className="w-full h-11 px-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-100 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all cursor-pointer"
                   >
-                    {Object.values(JobCategory).map((cat) => (
-                      <option key={cat} value={cat}>{cat.replace('_', ' ')}</option>
+                    <option value="" disabled>Select a category</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
                     ))}
                   </select>
                 </div>

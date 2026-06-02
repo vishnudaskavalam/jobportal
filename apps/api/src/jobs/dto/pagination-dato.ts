@@ -1,4 +1,4 @@
-import { JobCategory } from '@jobportal/types';
+
 import {
   IsNumberString,
   IsOptional,
@@ -20,7 +20,7 @@ export class PaginationDto {
 
   @IsOptional()
   @IsString()
-  category?: JobCategory;
+  category?: string;
 
   @IsOptional()
   @IsString()

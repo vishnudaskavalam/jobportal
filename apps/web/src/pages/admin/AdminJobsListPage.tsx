@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../componets/layout/AdminSidebar';
 import axiosInstance from '../../api/privateApi';
-import { JobCategory } from '@jobportal/types';
+
 
 interface Job {
   id: string;
@@ -11,7 +11,7 @@ interface Job {
   location: string;
   salary: string;
   type: string;
-  category: JobCategory;
+  category: { id: string; name: string };
   isFeatured: boolean;
   createdAt: string;
 }
@@ -25,28 +25,31 @@ interface MetaData {
   hasPreviousPage: boolean;
 }
 
-import { useSelector } from 'react-redux';
-import type { RootState } from '../../store/store';
+
 
 export default function AdminJobsListPage() {
   const navigate = useNavigate();
-  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
-  // useEffect(() => {
-  //   if (!accessToken) {
-  //     navigate('/login');
-  //   }
-  // }, [accessToken, navigate]);
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [meta, setMeta] = useState<MetaData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   
   // Filters & Pagination
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string>('');
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axiosInstance.get('/categories');
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    }
+  };
 
   const fetchJobs = async () => {
     setLoading(true);
@@ -79,6 +82,10 @@ export default function AdminJobsListPage() {
       }
     }
   };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     fetchJobs();
@@ -145,8 +152,8 @@ export default function AdminJobsListPage() {
                 onChange={handleCategoryChange}
               >
                 <option value="">All Categories</option>
-                {Object.values(JobCategory).map((cat) => (
-                  <option key={cat} value={cat}>{cat.replace('_', ' ')}</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
               </select>
             </div>
@@ -191,7 +198,7 @@ export default function AdminJobsListPage() {
                         <td className="px-6 py-4">
                           <div className="flex flex-col">
                             <span className="text-slate-200 font-bold">{job.title}</span>
-                            <span className="text-xs text-slate-500 mt-0.5">{job.category}</span>
+                            <span className="text-xs text-slate-500 mt-0.5">{job.category?.name || 'Uncategorized'}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4 text-slate-300">{job.company}</td>

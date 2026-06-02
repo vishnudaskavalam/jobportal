@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { UserEntity } from '../users/entities/user.entity';
+import { CategoryEntity } from '../categories/entities/category.entity';
 import { UserRole } from '@jobportal/types';
 
 @Injectable()
@@ -11,10 +12,27 @@ export class AdminSeed implements OnModuleInit {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(CategoryEntity)
+    private readonly categoryRepository: Repository<CategoryEntity>,
   ) {}
 
   async onModuleInit() {
     await this.seedAdmin();
+    await this.seedCategories();
+  }
+
+  async seedCategories() {
+    const count = await this.categoryRepository.count();
+    if (count > 0) return;
+
+    const categories = [
+      'Engineering', 'Design', 'Marketing', 'Sales', 'HR', 'Finance', 'DevOps', 'Data Science'
+    ];
+
+    for (const name of categories) {
+      await this.categoryRepository.save({ name });
+    }
+    console.log('Initial categories seeded successfully');
   }
 
   async seedAdmin() {

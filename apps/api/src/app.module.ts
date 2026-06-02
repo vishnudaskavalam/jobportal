@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module.js';
 import { JobsModule } from './jobs/jobs.module';
 import { SeedModule } from './seeds/admin-seed.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { SeedModule } from './seeds/admin-seed.module';
     UsersModule,
     AuthModule,
     JobsModule,
+    CategoriesModule,
   ],
   
 })

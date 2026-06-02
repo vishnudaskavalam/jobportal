@@ -1,12 +1,13 @@
 import {
   IsBoolean,
   IsEnum,
+  IsNotEmpty,
   IsOptional,
   IsString,
 } from 'class-validator';
 
 import { JobType } from '../entities/job.entity';
-import { JobCategory } from '@jobportal/types';
+
 
 export class CreateJobDto {
   @IsString()
@@ -28,8 +29,9 @@ export class CreateJobDto {
   @IsEnum(JobType)
   type: JobType;
 
-  @IsEnum(JobCategory)
-  category: JobCategory;
+  @IsString()
+  @IsNotEmpty()
+  categoryId: string;
 
   @IsOptional()
   @IsString()

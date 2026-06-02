@@ -1,5 +1,4 @@
 import { User, UserRole } from './user';
-import { JobCategory } from './jobCategory';
-export type { User };
+import { Category } from './category';
+export type { User, Category };
 export { UserRole };
-export { JobCategory };

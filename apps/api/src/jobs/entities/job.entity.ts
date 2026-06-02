@@ -1,10 +1,11 @@
-import { JobCategory } from '@jobportal/types';
+import { CategoryEntity } from '../../categories/entities/category.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 
 export enum JobType {
@@ -54,12 +55,8 @@ export class JobEntity {
   })
   type: JobType;
 
-  @Column({
-    type: 'enum',
-    enum: JobCategory,
-    default: JobCategory.ENGINEERING,
-  })
-  category: JobCategory;
+  @ManyToOne(() => CategoryEntity)
+  category: CategoryEntity;
 
   @Column({
     type: 'enum',

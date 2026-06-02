@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import AdminSidebar from '../../componets/layout/AdminSidebar';
 import axiosInstance from '../../api/privateApi';
-import { JobCategory } from '@jobportal/types';
+
 import type { RootState } from '../../store/store';
 
 interface JobApplication {
@@ -24,7 +24,7 @@ interface Job {
   location: string;
   salary: string;
   type: string;
-  category: JobCategory;
+  category: { id: string; name: string };
   logoColor: string;
   isFeatured: boolean;
   JobStatus: string;
@@ -224,7 +224,7 @@ export default function AdminJobDetailsPage() {
                   </div>
                   <div className="flex justify-between items-center p-3 rounded-xl bg-slate-950/50 border border-white/5">
                     <span className="text-sm font-medium text-slate-400">Category</span>
-                    <span className="text-sm font-bold text-slate-200">{job.category}</span>
+                    <span className="text-sm font-bold text-slate-200">{job.category?.name || 'Uncategorized'}</span>
                   </div>
                 </div>
               </div>

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Header from '../componets/layout/header';
 import axiosInstance from '../api/privateApi';
-import { JobCategory } from '@jobportal/types';
+
 import type { RootState } from '../store/store';
 import { logout } from '../store/authSlice';
 import Footer from '../componets/layout/footer';
@@ -15,7 +15,7 @@ interface Job {
   location: string;
   salary: string;
   type: string;
-  category: JobCategory;
+  category: { id: string; name: string };
   logoColor: string;
   isFeatured: boolean;
   createdAt: string;

@@ -9,8 +9,17 @@ import type { RootState } from '../store/store';
 import axiosInstance from '../api/privateApi';
 import Footer from '../componets/layout/footer';
 
+interface Job {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  salary: string;
+  type: string;
+  logoColor: string;
+}
+
 export default function App() {
-  const [searchTerm, setSearchTerm] = useState('')
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
@@ -31,7 +40,7 @@ export default function App() {
 
   }
 
-  let [featuredJobs, setFeaturedJobs] = useState([]);
+  const [featuredJobs, setFeaturedJobs] = useState<Job[]>([]);
 
   const fetchJobs = async () => {
     setLoading(true);
@@ -117,7 +126,8 @@ useEffect(() => {
                       onClick={() => navigate(`/jobs/${job.id}`)}
                     >
                       <div
-                        className={`w-12 h-12 rounded-xl flex items-center justify-center ${job.logoColor} font-bold text-lg`}
+                        className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg text-white shadow-md"
+                        style={{ backgroundColor: job.logoColor || '#10B981' }}
                       >
                         {job.company.charAt(0)}
                       </div>

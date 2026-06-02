@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from '../componets/layout/header';
 import axiosInstance from '../api/privateApi';
-import { JobCategory } from '@jobportal/types';
+
 import type { RootState } from '../store/store';
 import { logout } from '../store/authSlice';
 import Footer from '../componets/layout/footer';
@@ -15,7 +15,7 @@ interface Job {
   location: string;
   salary: string;
   type: string;
-  category: JobCategory;
+  category: { id: string; name: string };
   logoColor: string;
 }
 
@@ -36,6 +36,7 @@ export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [meta, setMeta] = useState<MetaData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
 
   // Filters & Pagination
   const [page, setPage] = useState(1);
@@ -44,6 +45,15 @@ export default function JobsPage() {
   const [category, setCategory] = useState<string>('');
   const [location, setLocation] = useState('');
   const [posted, setPosted] = useState('');
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axiosInstance.get('/categories');
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    }
+  };
 
   const fetchJobs = async () => {
     setLoading(true);
@@ -66,6 +76,10 @@ export default function JobsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     fetchJobs();
@@ -157,8 +171,8 @@ export default function JobsPage() {
                 onChange={handleCategoryChange}
               >
                 <option value="">All Categories</option>
-                {Object.values(JobCategory).map((cat) => (
-                  <option key={cat} value={cat}>{cat.replace('_', ' ')}</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
               </select>
 

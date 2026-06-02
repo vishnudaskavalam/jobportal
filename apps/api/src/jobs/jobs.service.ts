@@ -16,7 +16,11 @@ export class JobsService {
   ) {}
 
   create(data: any) {
-    return this.jobsRepository.save(data);
+    const { categoryId, ...rest } = data;
+    return this.jobsRepository.save({
+      ...rest,
+      category: { id: categoryId },
+    });
   }
 
 
@@ -29,13 +33,14 @@ export class JobsService {
   posted?: string,
 ) {
   const queryBuilder =
-    this.jobsRepository.createQueryBuilder('job');
+    this.jobsRepository.createQueryBuilder('job')
+    .leftJoinAndSelect('job.category', 'category');
 
   queryBuilder.where('job.JobStatus != :deletedStatus', { deletedStatus: 'DELETED' });
 
   if (category) {
     queryBuilder.andWhere(
-      'job.category = :category',
+      'category.id = :category',
       { category },
     );
   }
@@ -107,6 +112,7 @@ export class JobsService {
   async findOne(id: string) {
     const job = await this.jobsRepository.findOne({
       where: { id },
+      relations: ['category'],
     });
     
     if (job && job.applications && job.applications.length > 0) {
@@ -137,7 +143,12 @@ export class JobsService {
     id: string,
     data: any,
   ) {
-    await this.jobsRepository.update(id, data);
+    const { categoryId, ...rest } = data;
+    const updateData: any = { ...rest };
+    if (categoryId) {
+      updateData.category = { id: categoryId };
+    }
+    await this.jobsRepository.update(id, updateData);
     return this.findOne(id);
   }
 
@@ -193,6 +204,7 @@ console.log(job.applications), userId;
         isFeatured: true,
         JobStatus: Not('DELETED'),
       },
+      relations: ['category'],
       order: {
         createdAt: 'DESC',
       },
