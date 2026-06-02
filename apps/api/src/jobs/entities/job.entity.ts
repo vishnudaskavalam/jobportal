@@ -63,10 +63,10 @@ export class JobEntity {
 
   @Column({
     type: 'enum',
-    enum: ['OPEN', 'CLOSED'],
+    enum: ['OPEN', 'CLOSED', 'DELETED'],
     default: 'OPEN',
   })
-  JobStatus: 'OPEN' | 'CLOSED';
+  JobStatus: 'OPEN' | 'CLOSED' | 'DELETED';
 
   @Column({
     default: false,

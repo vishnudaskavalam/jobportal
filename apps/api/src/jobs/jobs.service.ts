@@ -3,7 +3,7 @@ import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JobApplication, JobEntity } from './entities/job.entity';
-import { Repository, In } from 'typeorm';
+import { Repository, In, Not } from 'typeorm';
 import { UserEntity } from '../users/entities/user.entity';
 
 @Injectable()
@@ -30,6 +30,8 @@ export class JobsService {
 ) {
   const queryBuilder =
     this.jobsRepository.createQueryBuilder('job');
+
+  queryBuilder.where('job.JobStatus != :deletedStatus', { deletedStatus: 'DELETED' });
 
   if (category) {
     queryBuilder.andWhere(
@@ -140,7 +142,8 @@ export class JobsService {
   }
 
   async remove(id: string) {
-    return this.jobsRepository.delete(id);
+    await this.jobsRepository.update(id, { JobStatus: 'DELETED' });
+    return { success: true, message: 'Job successfully deleted' };
   }
   async apply(
     jobId: string,
@@ -185,11 +188,15 @@ console.log(job.applications), userId;
   }
 
   findFeatured() {
-  return this.jobsRepository.find({
-    where: {
-      isFeatured: true,
-    },
-  });
+    return this.jobsRepository.find({
+      where: {
+        isFeatured: true,
+        JobStatus: Not('DELETED'),
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
   }
   count() {
     return this.jobsRepository.count({where : {
