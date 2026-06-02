@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { logout } from "../../store/authSlice";
-import Button from "../../componets/ui/Button";
+import { logout } from '@store';
+import { Button } from '@components';
 export default function AdminSidebar() {
     const navigate = useNavigate();
     const dispatch = useDispatch();

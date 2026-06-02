@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import JobCard, { type Job } from '../../componets/ui/JobCard';
-import Button from '../../componets/ui/Button';
-import { useGetJobsQuery } from '../../store/endpoints/jobsApi';
+import { JobCard, Button, type Job } from '@components';
+import { useGetJobsQuery } from '@store';
 
 export default function App() {
   const navigate = useNavigate();

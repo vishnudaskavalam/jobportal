@@ -2,8 +2,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from './header';
 import Footer from './footer';
-import { logout } from '../../store/authSlice';
-import type { RootState } from '../../store/store';
+import { logout, type RootState } from '@store';
 
 export default function UserLayout() {
   const navigate = useNavigate();

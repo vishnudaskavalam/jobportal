@@ -2,10 +2,9 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { useLoginMutation } from '../../store/endpoints/authApi';
-import { setTokens } from '../../store/authSlice';
+import { useLoginMutation, setTokens } from '@store';
 import { UserRole } from '@jobportal/types';
-import Button from '../../componets/ui/Button';
+import { Button } from '@components';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')

@@ -1,5 +1,4 @@
-import { useGetUserCountQuery } from '../../store/endpoints/usersApi';
-import { useGetJobCountQuery } from '../../store/endpoints/jobsApi';
+import { useGetUserCountQuery, useGetJobCountQuery } from '@store';
 
 export default function AdminDashboardPage() {
   const { data: totalUser = 0 } = useGetUserCountQuery();

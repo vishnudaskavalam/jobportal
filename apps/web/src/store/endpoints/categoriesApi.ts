@@ -1,4 +1,4 @@
-import { apiSlice } from '../apiSlice';
+import { apiSlice } from '../slice/apiSlice';
 
 export interface Category {
   id: string;

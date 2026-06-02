@@ -1,11 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGetAdminJobsQuery, useDeleteJobMutation } from '../../store/endpoints/jobsApi';
-import { useGetCategoriesQuery } from '../../store/endpoints/categoriesApi';
-import Button from '../../componets/ui/Button';
-import SearchBar from '../../componets/ui/SearchBar';
-import Dropdown from '../../componets/ui/Dropdown';
-import Pagination from '../../componets/ui/Pagination';
+import { useGetAdminJobsQuery, useDeleteJobMutation, useGetCategoriesQuery } from '@store';
+import { Button, SearchBar, Dropdown, Pagination } from '@components';
 
 
 export default function AdminJobsListPage() {

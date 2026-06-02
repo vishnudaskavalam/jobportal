@@ -1,16 +1,16 @@
 import { createBrowserRouter } from 'react-router-dom';
-import HomePage from '../pages/user/HomePage';
-import LoginPage from '../pages/auth/LoginPage';
-import SignupPage from '../pages/auth/SignupPage';
-import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
-import AdminJobsListPage from '../pages/admin/AdminJobsListPage';
-import AdminJobFormPage from '../pages/admin/AdminJobFormPage';
-import AdminJobDetailsPage from '../pages/admin/AdminJobDetailsPage';
-import JobsPage from '../pages/user/JobsPage';
-import JobDetailsPage from '../pages/user/JobDetailsPage';
-import AuthLayout from '../componets/layout/AuthLayout';
-import AdminLayout from '../componets/layout/AdminLayout';
-import UserLayout from '../componets/layout/UserLayout';
+import {
+  HomePage,
+  LoginPage,
+  SignupPage,
+  AdminDashboardPage,
+  AdminJobsListPage,
+  AdminJobFormPage,
+  AdminJobDetailsPage,
+  JobsPage,
+  JobDetailsPage
+} from '@pages';
+import { AuthLayout, AdminLayout, UserLayout } from '@components';
 
 export const router = createBrowserRouter([
   {

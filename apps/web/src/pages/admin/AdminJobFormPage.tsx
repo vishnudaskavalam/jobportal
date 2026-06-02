@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { useGetCategoriesQuery } from '../../store/endpoints/categoriesApi';
-import { useGetJobByIdQuery, useCreateJobMutation, useUpdateJobMutation } from '../../store/endpoints/jobsApi';
-
-import type { RootState } from '../../store/store';
+import { useGetCategoriesQuery, useGetJobByIdQuery, useCreateJobMutation, useUpdateJobMutation, type RootState } from '@store';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import Button from '../../componets/ui/Button';
+import { Button } from '@components';
 
 // We must manually duplicate JobType enum since it's defined in api/src/jobs/entities/job.entity.ts
 // In a real monorepo, we'd move JobType to @jobportal/types to share it.

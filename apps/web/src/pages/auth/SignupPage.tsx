@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { useSignupMutation } from '../../store/endpoints/authApi';
-import Button from '../../componets/ui/Button';
+import { useSignupMutation } from '@store';
+import { Button } from '@components';
 
 export default function SignupPage() {
   const [firstName, setFirstName] = useState('')

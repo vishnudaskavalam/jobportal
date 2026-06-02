@@ -1,7 +1,7 @@
 
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGetJobByIdQuery } from '../../store/endpoints/jobsApi';
-import Button from '../../componets/ui/Button';
+import { useGetJobByIdQuery } from '@store';
+import { Button } from '@components';
 
 
 

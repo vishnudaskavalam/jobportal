@@ -1,11 +1,6 @@
 import { useState } from 'react';
-import { useGetJobsQuery } from '../../store/endpoints/jobsApi';
-import JobCard from '../../componets/ui/JobCard';
-import SearchBar from '../../componets/ui/SearchBar';
-import Dropdown from '../../componets/ui/Dropdown';
-import Pagination from '../../componets/ui/Pagination';
-import Button from '../../componets/ui/Button';
-import { useGetCategoriesQuery } from '../../store';
+import { useGetJobsQuery, useGetCategoriesQuery } from '@store';
+import { JobCard, SearchBar, Dropdown, Pagination, Button } from '@components';
 
 
 

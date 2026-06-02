@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { useGetJobByIdQuery, useApplyForJobMutation } from '../../store/endpoints/jobsApi';
-import type { RootState } from '../../store/store';
-import Button from '../../componets/ui/Button';
+import { useGetJobByIdQuery, useApplyForJobMutation, type RootState } from '@store';
+import { Button } from '@components';
 
 export default function JobDetailsPage() {
   const { id } = useParams<{ id: string }>();

@@ -1,6 +1,5 @@
-import { apiSlice } from '../apiSlice';
-import type { Job } from '../../componets/ui/JobCard';
-import type { MetaData } from '../../componets/ui/Pagination';
+import { apiSlice } from '../slice/apiSlice';
+import type { Job, MetaData } from '@components';
 
 export interface JobsResponse {
   data: Job[];

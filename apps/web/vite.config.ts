@@ -12,6 +12,9 @@ export default defineConfig({
   resolve: {
     alias: {
       '@jobportal/types': path.resolve(__dirname, '../../packages/types/src/index.ts'),
+      '@components': path.resolve(__dirname, './src/componets'),
+      '@store': path.resolve(__dirname, './src/store'),
+      '@pages': path.resolve(__dirname, './src/pages'),
     },
   },
   server: {
