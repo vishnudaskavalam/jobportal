@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import Header from '../componets/layout/header';
-import axiosInstance from '../api/privateApi';
-import Button from '../componets/Button';
+import { useSelector } from 'react-redux';
+import axiosInstance from '../../api/privateApi';
+import Button from '../../componets/Button';
 
-import type { RootState } from '../store/store';
-import { logout } from '../store/authSlice';
-import Footer from '../componets/layout/footer';
+import type { RootState } from '../../store/store';
 
 interface Job {
   id: string;
@@ -27,7 +24,6 @@ interface Job {
 export default function JobDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
@@ -71,18 +67,9 @@ export default function JobDetailsPage() {
     }
   };
 
-  const handleSignInClick = () => {
-    if (accessToken) {
-      dispatch(logout());
-      navigate('/login');
-    } else {
-      navigate('/login');
-    }
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="flex-grow flex items-center justify-center">
         <div className="flex flex-col items-center gap-4 text-emerald-500">
           <svg className="w-12 h-12 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle className="opacity-25" cx="12" cy="12" r="10" />
@@ -96,7 +83,7 @@ export default function JobDetailsPage() {
 
   if (!job) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-6">
+      <div className="flex-grow flex flex-col items-center justify-center gap-6">
         <svg className="w-16 h-16 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
@@ -113,14 +100,7 @@ export default function JobDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-white">
-      {/* Background Glow */}
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-emerald-950/10 blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-[20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-slate-900/40 blur-[120px] pointer-events-none" />
-
-      {/* Navigation Header */}
-      <Header accessToken={accessToken} onSignInClick={handleSignInClick} />
-
+    <>
       <main className="flex-grow max-w-4xl mx-auto w-full px-6 py-12 md:py-20 z-10 flex flex-col gap-10">
 
         {/* Back Button */}
@@ -228,13 +208,12 @@ export default function JobDetailsPage() {
             <h3 className="text-xl font-bold text-white border-b border-white/5 pb-3">About The Role</h3>
             <div
               className="text-slate-400 font-medium leading-relaxed space-y-4 [&>ul]:list-disc [&>ul]:pl-4 [&>ul>li]:mb-2 [&>ol]:list-decimal [&>ol]:pl-4 [&>ol>li]:mb-2 [&>h1]:text-2xl [&>h1]:text-white [&>h1]:mt-6 [&>h1]:mb-4 [&>h2]:text-xl [&>h2]:text-white [&>h2]:mt-5 [&>h2]:mb-3 [&>h3]:text-lg [&>h3]:text-white [&>h3]:mt-4 [&>h3]:mb-2 [&>p]:mb-4 [&>strong]:text-slate-200"
-              dangerouslySetInnerHTML={{ __html: job.description }}
+              dangerouslySetInnerHTML={{ __html: job.description || '' }}
             />
           </section>
         </div>
 
       </main>
-      <Footer></Footer>
-    </div>
+    </>
   );
 }

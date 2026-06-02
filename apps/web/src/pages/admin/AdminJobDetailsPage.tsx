@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import AdminSidebar from '../../componets/layout/AdminSidebar';
 import axiosInstance from '../../api/privateApi';
 import Button from '../../componets/Button';
 
@@ -67,9 +66,7 @@ export default function AdminJobDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex relative overflow-hidden">
-        <AdminSidebar />
-        <main className="flex-1 flex flex-col items-center justify-center">
+        <div className="flex-1 flex flex-col items-center justify-center min-h-screen">
           <div className="flex flex-col items-center gap-3">
             <svg className="w-8 h-8 animate-spin text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle className="opacity-25" cx="12" cy="12" r="10" />
@@ -77,16 +74,13 @@ export default function AdminJobDetailsPage() {
             </svg>
             <span className="text-slate-400 font-medium">Loading job details...</span>
           </div>
-        </main>
-      </div>
+        </div>
     );
   }
 
   if (error || !job) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex relative overflow-hidden">
-        <AdminSidebar />
-        <main className="flex-1 flex flex-col items-center justify-center gap-4">
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 min-h-screen">
           <svg className="w-16 h-16 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
@@ -97,22 +91,12 @@ export default function AdminJobDetailsPage() {
           >
             Back to Jobs
           </Button>
-        </main>
-      </div>
+        </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex selection:bg-emerald-500 selection:text-white relative overflow-hidden">
-      {/* Background Glow */}
-      <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-emerald-950/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-slate-900/40 blur-[120px] pointer-events-none" />
-
-      {/* Sidebar */}
-      <AdminSidebar />
-
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col min-h-screen z-10 overflow-y-auto">
+    <>
         <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-slate-950/50 backdrop-blur-md sticky top-0 z-20">
           <div className="flex items-center gap-4">
             <Button 
@@ -271,7 +255,6 @@ export default function AdminJobDetailsPage() {
           </div>
 
         </div>
-      </main>
-    </div>
+    </>
   );
 }

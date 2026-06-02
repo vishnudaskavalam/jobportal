@@ -1,24 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import Header from '../componets/layout/header';
-import axiosInstance from '../api/privateApi';
-
-import type { RootState } from '../store/store';
-import { logout } from '../store/authSlice';
-import Footer from '../componets/layout/footer';
-import JobCard, { type Job } from '../componets/JobCard';
-import SearchBar from '../componets/SearchBar';
-import Dropdown from '../componets/Dropdown';
-import Pagination, { type MetaData } from '../componets/Pagination';
-import Button from '../componets/Button';
+import axiosInstance from '../../api/privateApi';
+import JobCard, { type Job } from '../../componets/JobCard';
+import SearchBar from '../../componets/SearchBar';
+import Dropdown from '../../componets/Dropdown';
+import Pagination, { type MetaData } from '../../componets/Pagination';
+import Button from '../../componets/Button';
 
 
 
 export default function JobsPage() {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [meta, setMeta] = useState<MetaData | null>(null);
@@ -92,26 +82,11 @@ export default function JobsPage() {
     setPage(1); // Reset to first page
   };
 
-  const handleSignInClick = () => {
-    if (accessToken) {
-      dispatch(logout());
-      navigate('/login');
-    } else {
-      navigate('/login');
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-white">
-      {/* Background Glow */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-emerald-950/10 blur-[120px] pointer-events-none" />
-      <div className="absolute top-[20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-slate-900/40 blur-[120px] pointer-events-none" />
-
-      {/* Navigation Header */}
-      <Header accessToken={accessToken} onSignInClick={handleSignInClick} />
+    <>
 
       <main className="flex-grow flex flex-col gap-10 px-6 max-w-6xl mx-auto w-full py-12 z-10">
-        
+
         {/* Page Header & Filters */}
         <div className="flex flex-col gap-6">
           <div>
@@ -180,7 +155,7 @@ export default function JobsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <p className="font-medium">No jobs found matching your criteria.</p>
-              <Button 
+              <Button
                 onClick={() => { setSearch(''); setCategory(''); setLocation(''); setPosted(''); setPage(1); }}
                 variant="link"
                 className="mt-2 text-sm text-emerald-400 font-semibold hover:text-emerald-300"
@@ -203,7 +178,6 @@ export default function JobsPage() {
         )}
 
       </main>
-      <Footer></Footer>
-    </div>
+    </>
   );
 }
