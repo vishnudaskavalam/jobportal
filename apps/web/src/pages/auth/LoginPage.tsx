@@ -137,7 +137,7 @@ export default function LoginPage() {
           <label className="flex items-center gap-2.5 cursor-pointer text-slate-400 hover:text-slate-200 transition-colors">
             <input
               type="checkbox"
-              className="appearance-none w-[18px] h-[18px] border border-white/10 rounded-md bg-slate-950 checked:bg-emerald-500 checked:border-emerald-500 cursor-pointer relative checked:after:content-[''] checked:after:absolute checked:after:left-[5px] checked:after:top-[2px] checked:after:w-[5px] checked:after:height-[9px] checked:after:border-white checked:after:border-r-2 checked:after:border-b-2 checked:after:rotate-45 transition-all"
+              className="appearance-none w-[18px] h-[18px] border border-white/10 rounded-md bg-slate-950 checked:bg-emerald-500 checked:border-emerald-500 cursor-pointer relative checked:after:content-[''] checked:after:absolute checked:after:left-[5px] checked:after:top-[2px] checked:after:w-[5px] checked:after:h-[9px] checked:after:border-white checked:after:border-r-2 checked:after:border-b-2 checked:after:rotate-45 transition-all"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
               disabled={isLoading}
