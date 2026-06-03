@@ -16,7 +16,16 @@ axiosInstance.interceptors.request.use((config) => {
 });
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response.data && typeof response.data === 'object' && 'success' in response.data) {
+      if (response.data.meta !== undefined) {
+        response.data = { data: response.data.data, meta: response.data.meta };
+      } else {
+        response.data = response.data.data;
+      }
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
     if (
@@ -37,7 +46,7 @@ axiosInstance.interceptors.response.use(
           },
         );
 
-        const newAccessToken = response.data.accessToken;
+        const newAccessToken = response.data.data?.accessToken || response.data.accessToken;
 
         storage.setAccessToken(newAccessToken);
 
