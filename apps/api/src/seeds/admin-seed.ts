@@ -16,13 +16,19 @@ export class AdminSeed {
     private readonly categoryRepository: Repository<CategoryEntity>,
   ) {}
 
-
   async seedCategories() {
     const count = await this.categoryRepository.count();
     if (count > 0) return;
 
     const categories = [
-      'Engineering', 'Design', 'Marketing', 'Sales', 'HR', 'Finance', 'DevOps', 'Data Science'
+      'Engineering',
+      'Design',
+      'Marketing',
+      'Sales',
+      'HR',
+      'Finance',
+      'DevOps',
+      'Data Science',
     ];
 
     for (const name of categories) {
@@ -43,10 +49,7 @@ export class AdminSeed {
       return;
     }
 
-    const hashedPassword = await bcrypt.hash(
-      'Admin@123',
-      10,
-    );
+    const hashedPassword = await bcrypt.hash('Admin@123', 10);
 
     const admin = this.userRepository.create({
       firstName: 'Super',

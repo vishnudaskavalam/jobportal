@@ -45,7 +45,7 @@ export default function SignupPage() {
       setTimeout(() => {
         navigate('/login')
       }, 1500)
-    } catch (err: any) {
+    } catch (err) {
       setStatus('error')
       const errorMessage = Array.isArray(err?.data?.message) 
           ? err.data.message[0] 

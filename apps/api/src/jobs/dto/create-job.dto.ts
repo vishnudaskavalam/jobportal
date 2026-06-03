@@ -8,7 +8,6 @@ import {
 
 import { JobType } from '../entities/job.entity';
 
-
 export class CreateJobDto {
   @IsString()
   title: string;

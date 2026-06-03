@@ -33,6 +33,5 @@ import { CategoriesModule } from './categories/categories.module';
     JobsModule,
     CategoriesModule,
   ],
-  
 })
 export class AppModule {}

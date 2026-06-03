@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
@@ -13,6 +23,12 @@ import { CurrentUser } from '../auth/decorators/user.decorator';
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
+  /**
+   * @description create a new job
+   * @param createJobDto Job details
+   * @returns
+   *
+   */
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -20,45 +36,51 @@ export class JobsController {
     return this.jobsService.create(createJobDto);
   }
 
+  /**
+   * @description get all jobs
+   * @param query PaginationDto
+   * @returns
+   *
+   */
   @Get()
-    @Post()
   @UseGuards(AuthGuard, RolesGuard)
-@Roles(UserRole.ADMIN)
-findAll(
-  @Query() query: PaginationDto,
-) {
-  return this.jobsService.findAll(
-    Number(query.page),
-    Number(query.limit),
-    query.category,
-    query.search,
-    query.location,
-    query.posted,
-    query.yearsOfExperience,
-  );
+  @Roles(UserRole.ADMIN)
+  findAll(@Query() query: PaginationDto) {
+    return this.jobsService.findAll(
+      Number(query.page),
+      Number(query.limit),
+      query.category,
+      query.search,
+      query.location,
+      query.posted,
+      query.yearsOfExperience,
+    );
   }
 
+  /**
+   * @description count of all jobs
+   * @returns
+   *
+   */
   @Get('count')
   @UseGuards(AuthGuard, RolesGuard)
-@Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN)
   count() {
     return this.jobsService.count();
   }
   @Get('/list')
-    @Post()
-jobList(
-  @Query() query: PaginationDto,
-) {
-  return this.jobsService.findAll(
-    Number(query.page),
-    Number(query.limit),
-    query.category,
-    query.search,
-    query.location,
-    query.posted,
-    query.yearsOfExperience,
-  );
-}
+  @Post()
+  jobList(@Query() query: PaginationDto) {
+    return this.jobsService.findAll(
+      Number(query.page),
+      Number(query.limit),
+      query.category,
+      query.search,
+      query.location,
+      query.posted,
+      query.yearsOfExperience,
+    );
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -74,7 +96,7 @@ jobList(
 
   @Post(':id/apply')
   @UseGuards(AuthGuard)
-  apply(@Param('id') id: string, @CurrentUser() user: any) {    
+  apply(@Param('id') id: string, @CurrentUser() user: any) {
     return this.jobsService.apply(id, user.sub);
   }
 

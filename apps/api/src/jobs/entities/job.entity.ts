@@ -17,16 +17,14 @@ export enum JobType {
 
 export interface JobApplication {
   userId: string;
-  status:
-    | 'APPLIED'
-    | 'REVIEWING'
-    | 'SHORTLISTED'
-    | 'REJECTED'
-    | 'HIRED';
+  status: 'APPLIED' | 'REVIEWING' | 'SHORTLISTED' | 'REJECTED' | 'HIRED';
   appliedAt: Date;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
 }
-
-
 
 @Entity('jobs')
 export class JobEntity {

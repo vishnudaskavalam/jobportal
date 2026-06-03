@@ -46,7 +46,7 @@ export default function LoginPage() {
       } else {
         navigate("/");
       }
-    } catch (err: any) {
+    } catch (err) {
         setStatus('error')
         const errorMessage = Array.isArray(err?.data?.message) 
             ? err.data.message[0] 

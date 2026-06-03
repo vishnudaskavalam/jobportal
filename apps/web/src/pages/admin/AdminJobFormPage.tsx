@@ -7,13 +7,13 @@ import 'react-quill-new/dist/quill.snow.css';
 import { Button } from '@components';
 
 
-export const JobType = {
+const JobType = {
   FULL_TIME: 'FULL_TIME',
   PART_TIME: 'PART_TIME',
   CONTRACT: 'CONTRACT',
   INTERNSHIP: 'INTERNSHIP',
 } as const;
-export type JobType = typeof JobType[keyof typeof JobType];
+type JobType = typeof JobType[keyof typeof JobType];
 
 export default function AdminJobFormPage() {
   const navigate = useNavigate();
@@ -47,25 +47,27 @@ export default function AdminJobFormPage() {
 
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const [prevJobId, setPrevJobId] = useState<string | null>(null);
+  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
 
-  useEffect(() => {
-    if (job) {
-      setFormData({
-        title: job.title || '',
-        company: job.company || '',
-        location: job.location || '',
-        salary: job.salary || '',
-        type: (job.type as JobType) || JobType.FULL_TIME,
-        categoryId: job.category?.id || '',
-        logoColor: job.logoColor || '#10B981',
-        isFeatured: job.isFeatured || false,
-        yearsOfExperience: job.yearsOfExperience || '',
-        description: (job as any).description || '',
-      });
-    } else if (categories.length > 0 && !isEditMode && !formData.categoryId) {
-      setFormData(prev => ({ ...prev, categoryId: categories[0].id }));
-    }
-  }, [job, categories, isEditMode]);
+  if (job && job.id !== prevJobId) {
+    setPrevJobId(job.id);
+    setFormData({
+      title: job.title || '',
+      company: job.company || '',
+      location: job.location || '',
+      salary: job.salary || '',
+      type: (job.type as JobType) || JobType.FULL_TIME,
+      categoryId: job.category?.id || '',
+      logoColor: job.logoColor || '#10B981',
+      isFeatured: job.isFeatured || false,
+      yearsOfExperience: job.yearsOfExperience || '',
+      description: (job).description || '',
+    });
+  } else if (categories.length > 0 && !isEditMode && !categoriesLoaded) {
+    setCategoriesLoaded(true);
+    setFormData(prev => ({ ...prev, categoryId: categories[0].id }));
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -99,7 +101,7 @@ export default function AdminJobFormPage() {
       setTimeout(() => {
         navigate('/admin/jobs');
       }, 1500);
-    } catch (error: any) {
+    } catch (error) {
       setStatus('error');
       setMessage(error?.data?.message || 'An error occurred while saving the job.');
     }

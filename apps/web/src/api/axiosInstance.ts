@@ -54,7 +54,7 @@ axiosInstance.interceptors.response.use(
           `Bearer ${newAccessToken}`;
 
         return axiosInstance(originalRequest);
-      } catch (refreshError) {
+      } catch {
         storage.clear();
         window.location.href = '/login';
       }

@@ -6,7 +6,7 @@ import { CategoryEntity } from './entities/category.entity';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [AuthModule,TypeOrmModule.forFeature([CategoryEntity])],
+  imports: [AuthModule, TypeOrmModule.forFeature([CategoryEntity])],
   controllers: [CategoriesController],
   providers: [CategoriesService],
   exports: [CategoriesService],

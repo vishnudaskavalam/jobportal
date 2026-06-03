@@ -6,9 +6,19 @@ export interface JobsResponse {
   meta: MetaData;
 }
 
+export interface GetJobsParams {
+  page?: number;
+  limit?: number;
+  category?: string;
+  search?: string;
+  location?: string;
+  posted?: string;
+  yearsOfExperience?: string;
+}
+
 export const jobsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getJobs: builder.query<JobsResponse, any>({
+    getJobs: builder.query<JobsResponse, GetJobsParams>({
       query: (params) => ({
         url: '/jobs/list',
         method: 'GET',
@@ -16,7 +26,7 @@ export const jobsApi = apiSlice.injectEndpoints({
       }),
       providesTags: [{ type: 'Job', id: 'LIST' }],
     }),
-    getAdminJobs: builder.query<JobsResponse, any>({
+    getAdminJobs: builder.query<JobsResponse, GetJobsParams>({
       query: (params) => ({
         url: '/jobs',
         method: 'GET',
@@ -31,7 +41,7 @@ export const jobsApi = apiSlice.injectEndpoints({
       }),
       providesTags: (_result, _error, id) => [{ type: 'Job', id }],
     }),
-    createJob: builder.mutation<Job, any>({
+    createJob: builder.mutation<Job, Partial<Job>>({
       query: (job) => ({
         url: '/jobs',
         method: 'POST',
@@ -39,7 +49,7 @@ export const jobsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'Job', id: 'LIST' }],
     }),
-    updateJob: builder.mutation<Job, { id: string; data: any }>({
+    updateJob: builder.mutation<Job, { id: string; data: Partial<Job> }>({
       query: ({ id, data }) => ({
         url: `/jobs/${id}`,
         method: 'PATCH',
@@ -60,7 +70,7 @@ export const jobsApi = apiSlice.injectEndpoints({
         { type: 'Job', id: 'LIST' },
       ],
     }),
-    applyForJob: builder.mutation<any, string>({
+    applyForJob: builder.mutation<Job, string>({
       query: (id) => ({
         url: `/jobs/${id}/apply`,
         method: 'POST',

@@ -11,7 +11,7 @@ export default function AdminJobDetailsPage() {
   const navigate = useNavigate();
 
   const { data: job, isLoading: loading, error: fetchError } = useGetJobByIdQuery(id as string, { skip: !id });
-  const error = fetchError ? (fetchError as any)?.data?.message || 'Failed to load job details.' : '';
+  const error = fetchError ? fetchError?.data?.message || 'Failed to load job details.' : '';
 
   if (loading) {
     return (

@@ -7,8 +7,8 @@ import { JobEntity } from './entities/job.entity';
 import { UserEntity } from '../users/entities/user.entity';
 
 @Module({
-  imports: [AuthModule,TypeOrmModule.forFeature([JobEntity, UserEntity])],
+  imports: [AuthModule, TypeOrmModule.forFeature([JobEntity, UserEntity])],
   controllers: [JobsController],
   providers: [JobsService],
 })
-export class JobsModule { }
+export class JobsModule {}

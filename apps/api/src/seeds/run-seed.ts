@@ -6,7 +6,6 @@ async function bootstrap() {
   console.log('Starting seeder...');
   const app = await NestFactory.createApplicationContext(AppModule);
   const seeder = app.get(AdminSeed);
-  
   try {
     await seeder.seedAdmin();
     await seeder.seedCategories();

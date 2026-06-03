@@ -28,7 +28,8 @@ export default function JobDetailsPage() {
       await applyForJob(id as string).unwrap();
       setApplyStatus('success');
       setMessage('Successfully applied for this position!');
-    } catch (error: any) {
+    } catch (err) {
+      const error = err as { data?: { message?: string } };
       setApplyStatus('error');
       setMessage(error?.data?.message || 'Failed to apply. You may have already applied.');
     }
