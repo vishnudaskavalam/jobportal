@@ -6,7 +6,6 @@ import path from 'path'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [tailwindcss(), react()],
   resolve: {
