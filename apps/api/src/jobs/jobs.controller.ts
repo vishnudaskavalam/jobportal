@@ -34,6 +34,7 @@ findAll(
     query.search,
     query.location,
     query.posted,
+    query.yearsOfExperience,
   );
   }
 
@@ -55,6 +56,7 @@ jobList(
     query.search,
     query.location,
     query.posted,
+    query.yearsOfExperience,
   );
 }
 

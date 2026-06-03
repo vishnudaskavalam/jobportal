@@ -22,11 +22,11 @@ export class SeedActualData1780427439614 implements MigrationInterface {
         // Insert Jobs if categories exist
         if (engineeringCategory.length > 0 && designCategory.length > 0) {
             await queryRunner.query(`
-                INSERT INTO "jobs" (id, title, company, location, description, salary, type, "categoryId", "createdAt", "updatedAt")
+                INSERT INTO "jobs" (id, title, company, "yearsOfExperience", location, description, salary, type, "categoryId", "createdAt", "updatedAt")
                 VALUES 
-                    (gen_random_uuid(), 'Senior Full Stack Engineer (5+ YOE)', 'TechCorp Inc.', 'San Francisco, CA (Remote)', '<p>We are looking for an experienced engineer to lead our product development.</p>', '$140k - $180k', 'FULL_TIME', '${engineeringCategory[0].id}', NOW(), NOW()),
-                    (gen_random_uuid(), 'UX/UI Designer (3+ YOE)', 'Creative Studio', 'New York, NY', '<p>Join our award-winning design team.</p>', '$90k - $120k', 'FULL_TIME', '${designCategory[0].id}', NOW(), NOW()),
-                    (gen_random_uuid(), 'Backend Developer (Node.js) (2-4 YOE)', 'StartupX', 'Remote', '<p>Scaling our infrastructure using NestJS and PostgreSQL.</p>', '$110k - $150k', 'CONTRACT', '${engineeringCategory[0].id}', NOW(), NOW())
+                    (gen_random_uuid(), 'Senior Full Stack Engineer', 'TechCorp Inc.', '5+ years', 'San Francisco, CA (Remote)', '<p>We are looking for an experienced engineer to lead our product development.</p>', '$140k - $180k', 'FULL_TIME', '${engineeringCategory[0].id}', NOW(), NOW()),
+                    (gen_random_uuid(), 'UX/UI Designer', 'Creative Studio', '3-5 years', 'New York, NY', '<p>Join our award-winning design team.</p>', '$90k - $120k', 'FULL_TIME', '${designCategory[0].id}', NOW(), NOW()),
+                    (gen_random_uuid(), 'Backend Developer (Node.js)', 'StartupX', '2-4 years', 'Remote', '<p>Scaling our infrastructure using NestJS and PostgreSQL.</p>', '$110k - $150k', 'CONTRACT', '${engineeringCategory[0].id}', NOW(), NOW())
                 ON CONFLICT DO NOTHING;
             `);
         }

@@ -6,8 +6,7 @@ import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import { Button } from '@components';
 
-// We must manually duplicate JobType enum since it's defined in api/src/jobs/entities/job.entity.ts
-// In a real monorepo, we'd move JobType to @jobportal/types to share it.
+
 export const JobType = {
   FULL_TIME: 'FULL_TIME',
   PART_TIME: 'PART_TIME',
@@ -35,8 +34,9 @@ export default function AdminJobFormPage() {
     salary: '',
     type: JobType.FULL_TIME as JobType,
     categoryId: '',
-    logoColor: '#10B981',
+      logoColor: '#10B981',
     isFeatured: false,
+    yearsOfExperience: '',
     description: '',
   });
 
@@ -59,6 +59,7 @@ export default function AdminJobFormPage() {
         categoryId: job.category?.id || '',
         logoColor: job.logoColor || '#10B981',
         isFeatured: job.isFeatured || false,
+        yearsOfExperience: job.yearsOfExperience || '',
         description: (job as any).description || '',
       });
     } else if (categories.length > 0 && !isEditMode && !formData.categoryId) {
@@ -177,6 +178,21 @@ export default function AdminJobFormPage() {
                     value={formData.company}
                     onChange={handleChange}
                     placeholder="e.g. TechCorp Inc."
+                    className="w-full h-11 px-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-100 placeholder:text-slate-600 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all"
+                  />
+                </div>
+
+                {/* Years of Experience */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-[13px] font-semibold text-slate-300 tracking-wide" htmlFor="yearsOfExperience">Years of Experience</label>
+                  <input
+                    id="yearsOfExperience"
+                    name="yearsOfExperience"
+                    type="text"
+                    disabled={status === 'loading'}
+                    value={formData.yearsOfExperience}
+                    onChange={handleChange}
+                    placeholder="e.g. 3-5 years"
                     className="w-full h-11 px-4 bg-slate-950 border border-white/5 rounded-xl text-sm font-medium text-slate-100 placeholder:text-slate-600 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all"
                   />
                 </div>

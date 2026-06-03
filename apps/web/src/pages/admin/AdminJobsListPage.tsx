@@ -12,6 +12,7 @@ export default function AdminJobsListPage() {
   const [limit] = useState(10);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string>('');
+  const [yearsOfExperience, setYearsOfExperience] = useState('');
 
 
   const { data: jobsResponse, isLoading: loadingJobs, isFetching } = useGetAdminJobsQuery({
@@ -19,6 +20,7 @@ export default function AdminJobsListPage() {
     limit,
     ...(search && { search }),
     ...(category && { category }),
+    ...(yearsOfExperience && { yearsOfExperience }),
   });
   const jobs = jobsResponse?.data || [];
   const meta = jobsResponse?.meta || null;
@@ -86,6 +88,15 @@ export default function AdminJobsListPage() {
                 placeholder="All Categories"
                 className="w-full sm:w-auto h-11"
               />
+              <SearchBar
+                value={yearsOfExperience}
+                onChange={(e) => {
+                  setYearsOfExperience(e.target.value);
+                  setPage(1);
+                }}
+                placeholder="Experience (e.g. 3-5 years)"
+                className="w-full sm:w-auto h-11"
+              />
             </div>
           </div>
 
@@ -99,6 +110,7 @@ export default function AdminJobsListPage() {
                     <th className="px-6 py-4">Company</th>
                     <th className="px-6 py-4 hidden md:table-cell">Location</th>
                     <th className="px-6 py-4 hidden sm:table-cell">Type</th>
+                    <th className="px-6 py-4 hidden lg:table-cell">Experience</th>
                     <th className="px-6 py-4">Status</th>
                     <th className="px-6 py-4 text-right">Actions</th>
                   </tr>
@@ -137,6 +149,9 @@ export default function AdminJobsListPage() {
                           <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-800 border border-white/5 text-xs text-slate-300">
                             {job.type}
                           </span>
+                        </td>
+                        <td className="px-6 py-4 hidden lg:table-cell text-slate-400">
+                          {job.yearsOfExperience || 'Not specified'}
                         </td>
                         <td className="px-6 py-4">
                           {job.isFeatured ? (

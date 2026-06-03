@@ -31,6 +31,7 @@ export class JobsService {
   search?: string,
   location?: string,
   posted?: string,
+  yearsOfExperience?: string,
 ) {
   const queryBuilder =
     this.jobsRepository.createQueryBuilder('job')
@@ -84,6 +85,10 @@ export class JobsService {
     if (dateLimit) {
       queryBuilder.andWhere('job.createdAt >= :dateLimit', { dateLimit });
     }
+  }
+
+  if (yearsOfExperience) {
+    queryBuilder.andWhere('LOWER(job.yearsOfExperience) LIKE LOWER(:yearsOfExperience)', { yearsOfExperience: `%${yearsOfExperience}%` });
   }
 
   const [jobs, total] =

@@ -29,4 +29,8 @@ export class PaginationDto {
   @IsOptional()
   @IsString()
   posted?: string;
+
+  @IsOptional()
+  @IsString()
+  yearsOfExperience?: string;
 }

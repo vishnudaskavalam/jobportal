@@ -39,6 +39,9 @@ export class JobEntity {
   @Column()
   company: string;
 
+  @Column({ nullable: true })
+  yearsOfExperience: string;
+
   @Column()
   location: string;
 

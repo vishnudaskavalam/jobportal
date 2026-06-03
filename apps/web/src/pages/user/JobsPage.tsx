@@ -13,6 +13,7 @@ export default function JobsPage() {
   const [category, setCategory] = useState<string>('');
   const [location, setLocation] = useState('');
   const [posted, setPosted] = useState('');
+  const [yearsOfExperience, setYearsOfExperience] = useState('');
 
   const { data: jobsResponse, isLoading: loadingJobs, isFetching } = useGetJobsQuery({
     page,
@@ -21,6 +22,7 @@ export default function JobsPage() {
     ...(category && { category }),
     ...(location && { location }),
     ...(posted && { posted }),
+    ...(yearsOfExperience && { yearsOfExperience }),
   });
   const jobs = jobsResponse?.data || [];
   const meta = jobsResponse?.meta || null;
@@ -65,14 +67,14 @@ export default function JobsPage() {
               value={search}
               onChange={handleSearch}
               placeholder="Search titles, companies..."
-              className="w-full md:w-1/3"
+              className="w-full md:w-1/4"
             />
 
             <SearchBar
               value={location}
               onChange={handleLocationChange}
-              placeholder="Location (e.g. Remote, NY)"
-              className="w-full md:w-1/4"
+              placeholder="Location"
+              className="w-full md:w-1/8"
               icon={
                 <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -87,7 +89,7 @@ export default function JobsPage() {
                 onChange={handleCategoryChange}
                 options={categories.map((c) => ({ value: c.id, label: c.name }))}
                 placeholder="All Categories"
-                className="w-full h-12"
+                className="w-full md:w-1/2 h-12"
               />
 
               <Dropdown
@@ -99,6 +101,15 @@ export default function JobsPage() {
                   { value: '1m', label: 'Past month' },
                 ]}
                 placeholder="Any Time"
+                className="w-full h-12 md:w-1/2"
+              />
+              <SearchBar
+                value={yearsOfExperience}
+                onChange={(e) => {
+                  setYearsOfExperience(e.target.value);
+                  setPage(1);
+                }}
+                placeholder="Experience (e.g. 3-5 years)"
                 className="w-full h-12"
               />
             </div>
