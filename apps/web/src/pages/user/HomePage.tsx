@@ -1,0 +1,74 @@
+import { useNavigate } from 'react-router-dom';
+import { JobCard, Button, type Job } from '@components';
+import { useGetJobsQuery } from '@store';
+
+export default function App() {
+  const navigate = useNavigate();
+  const { data: response, isLoading: loading } = useGetJobsQuery({ isFeatured: true });
+  const featuredJobs = response?.data || [];
+
+  return (
+    <>
+      {/* Hero Section */}
+      <main className="flex-grow flex flex-col gap-16 px-6 max-w-6xl mx-auto w-full py-16 sm:py-24 z-10">
+        <section className="text-center flex flex-col items-center gap-6 max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-full uppercase tracking-wider mb-2">
+            ✨ Simplifying the job hunt
+          </div>
+          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight text-transparent bg-clip-text bg-gradient-to-b from-slate-100 to-slate-400">
+            Find the perfect tech job you deserve.
+          </h1>
+          <p className="text-base sm:text-lg text-slate-400 font-medium leading-relaxed">
+            Discover thousands of full-time, remote, and hybrid job opportunities with the world's most innovative tech companies.
+          </p>
+
+
+        </section>
+
+        {/* Featured Jobs */}
+        <section id="jobs" className="flex flex-col gap-6">
+          <div className="flex items-center justify-between border-b border-white/5 pb-4">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-100">Featured Job Openings</h2>
+            <Button
+              onClick={() => { navigate('/jobs') }}
+              variant="link"
+              className="text-sm font-bold text-emerald-400 hover:text-emerald-300"
+            >
+              View all jobs →
+            </Button>
+          </div>
+
+
+          {loading ? (
+
+            <div className="px-6 py-12 text-center text-slate-400 justify-">
+              <div className="flex flex-col items-center gap-3">
+                <svg className="w-8 h-8 animate-spin text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Loading jobs...
+              </div>
+
+            </div>
+          ) : featuredJobs.length === 0 ? (
+            <div className="px-6 py-12 text-center text-slate-400">
+              <div className="flex flex-col items-center gap-3">
+                No jobs found matching your criteria.
+              </div>
+            </div>
+
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {featuredJobs.map((job) => (
+                <JobCard key={job.id} job={job as Job} />
+              ))}
+            </div>
+          )
+          }
+        </section>
+      </main>
+
+    </>
+  )
+}
